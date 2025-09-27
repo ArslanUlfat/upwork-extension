@@ -109,16 +109,48 @@ async function findJobs() {
 
 function generateProposal(btn) {
   const jobCard = btn.closest('.job-card');
-  const jobTitle = jobCard.querySelector('.job-title').textContent;
+  const jobTitle = jobCard ? jobCard.querySelector('.job-title').textContent : 'Unknown Job';
+  const jobUrl = jobCard ? jobCard.querySelector('.job-title').getAttribute('data-url') : '#';
+  
+  console.log('Generate proposal clicked for:', jobTitle);
   
   btn.textContent = 'Generating...';
   btn.disabled = true;
   
+  // Save job data for proposal screen
+  const jobData = {
+    title: jobTitle,
+    url: jobUrl,
+    timestamp: new Date().toISOString()
+  };
+  
+  localStorage.setItem('current_job_for_proposal', JSON.stringify(jobData));
+  
+  // Simulate AI generation delay
   setTimeout(() => {
     btn.textContent = 'Generate Proposal';
     btn.disabled = false;
-    alert(`AI proposal generated for "${jobTitle}"!\n\nThis would normally open a proposal editor with AI-generated content.`);
-  }, 3000);
+    
+    console.log('Opening proposal review for:', jobTitle);
+    
+    // Open proposal review screen
+    openProposalReview(jobTitle, jobUrl);
+    
+    showNotification(`AI proposal generated for "${jobTitle}"!`, 'success');
+  }, 2000);
+}
+
+// Open proposal review screen within the extension
+function openProposalReview(jobTitle, jobUrl) {
+  console.log('openProposalReview called with:', { jobTitle, jobUrl });
+  
+  try {
+    // Create and show the proposal review overlay
+    createProposalReviewOverlay(jobTitle, jobUrl);
+  } catch (error) {
+    console.error('Error creating proposal overlay:', error);
+    alert('Error opening proposal review. Check console for details.');
+  }
 }
 
 function toggleBookmark(btn) {
@@ -140,9 +172,10 @@ function showSettings() {
 2. Notification Preferences  
 3. Debug Upwork Page Structure
 4. Test Content Script Connection
-5. View Extension Logs
+5. Test Proposal Overlay
+6. View Extension Logs
 
-Choose an option (1-5) or Cancel:
+Choose an option (1-6) or Cancel:
   `;
   
   const choice = prompt(settingsMenu);
@@ -162,6 +195,9 @@ Choose an option (1-5) or Cancel:
       testContentScriptConnection();
       break;
     case '5':
+      testProposalOverlay();
+      break;
+    case '6':
       alert('Check the browser console (F12) for extension logs.');
       break;
     default:
@@ -675,6 +711,15 @@ function setupEventListeners() {
   });
 }
 
+// Test function for proposal overlay
+function testProposalOverlay() {
+  console.log('Testing proposal overlay...');
+  createProposalReviewOverlay('Test Job - React Developer', 'https://www.upwork.com/test');
+}
+
+// Make test function available globally
+window.testProposalOverlay = testProposalOverlay;
+
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
   console.log('Upwork Extension v3.0.0 - AI Master (Fixed) initialized');
@@ -700,6 +745,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Show initialization success
   setTimeout(() => {
     console.log('Extension fully loaded and ready!');
+    console.log('You can test the proposal overlay by running: testProposalOverlay()');
   }, 500);
 });
 
@@ -763,6 +809,482 @@ function getTimeAgo(timestamp) {
   if (diffHours < 24) return `${diffHours}h ago`;
   if (diffDays < 7) return `${diffDays}d ago`;
   return past.toLocaleDateString();
+}
+
+// Create proposal review overlay within the extension
+function createProposalReviewOverlay(jobTitle, jobUrl) {
+  // Remove any existing overlay
+  const existingOverlay = document.getElementById('proposal-overlay');
+  if (existingOverlay) {
+    existingOverlay.remove();
+  }
+
+  // Create overlay container
+  const overlay = document.createElement('div');
+  overlay.id = 'proposal-overlay';
+  overlay.className = 'screen-overlay hidden';
+  
+  // Generate personalized proposal
+  const personalizedProposal = generatePersonalizedProposal(jobTitle);
+  
+  overlay.innerHTML = `
+    <header class="header">
+      <div class="header-content">
+        <button class="header-button" id="proposal-back-btn">
+          <span class="icon">←</span>
+        </button>
+        <h1 class="header-title">Proposal Review</h1>
+        <div style="width: 2.25rem; height: 2.25rem;"></div>
+      </div>
+    </header>
+
+    <main class="screen-content">
+      <!-- AI Generated Section -->
+      <section class="screen-section">
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+          <div style="padding: 0.5rem; background-color: rgba(59, 130, 246, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+            <span style="color: var(--blue-500); font-size: 1.5rem;">🤖</span>
+          </div>
+          <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--current-content);">AI Generated Proposal</h2>
+        </div>
+        <p style="font-size: 0.875rem; color: var(--current-subtle); margin-bottom: 1rem; line-height: 1.6;">
+          Review the AI-generated proposal below for "${jobTitle}". You can make edits before sending.
+        </p>
+      </section>
+
+      <!-- Template Selection -->
+      <section class="screen-section">
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--current-content); margin-bottom: 0.5rem;">Use a template</label>
+          <div style="position: relative;">
+            <select id="proposal-template-select" style="width: 100%; padding: 0.5rem 2.5rem; background-color: var(--current-bg); border: 1px solid var(--current-border); border-radius: 0.5rem; font-size: 0.875rem; color: var(--current-content); cursor: pointer; appearance: none;">
+              <option value="">No Template</option>
+              <option value="template1">Standard Frontend Proposal</option>
+              <option value="template2">Quick Intro Template</option>
+              <option value="template3">React Specialist Template</option>
+            </select>
+            <span style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--current-subtle); pointer-events: none;">📄</span>
+            <span style="position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%); color: var(--current-content); pointer-events: none;">▼</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Proposal Content -->
+      <section class="screen-section">
+        <div style="background-color: var(--current-bg); border: 1px solid var(--current-border); border-radius: 0.5rem; padding: 1rem;">
+          <h3 style="font-size: 1.125rem; font-weight: 700; color: var(--current-content); margin-bottom: 0.5rem;">Subject: Proposal for ${jobTitle}</h3>
+          <textarea 
+            id="proposal-textarea" 
+            style="width: 100%; background-color: var(--current-bg); border: 1px solid var(--current-border); border-radius: 0.5rem; padding: 0.75rem; font-size: 0.875rem; color: var(--current-content); line-height: 1.6; resize: vertical; min-height: 12rem; font-family: var(--font-family);"
+            placeholder="Your proposal will appear here..."
+          >${personalizedProposal}</textarea>
+          
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
+            <button id="proposal-proofread-btn" style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; font-weight: 500; color: var(--blue-500); background: none; border: none; cursor: pointer;">
+              <span>✓</span>
+              Proofread
+            </button>
+            <div style="font-size: 0.75rem; color: var(--current-subtle); text-align: right;" id="proposal-word-count">
+              <span id="proposal-words">0 Words</span> / <span id="proposal-chars">0 Characters</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer" style="padding: 1rem;">
+      <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        <div style="display: flex; gap: 0.75rem;">
+          <button id="proposal-reject-btn" class="btn btn-secondary btn-full" style="background-color: rgba(239, 68, 68, 0.1); color: var(--red-500);">
+            <span>✕</span>
+            Reject
+          </button>
+          <button id="proposal-regenerate-btn" class="btn btn-secondary btn-full" style="background-color: rgba(245, 158, 11, 0.1); color: var(--warning);">
+            <span>🔄</span>
+            Regenerate
+          </button>
+        </div>
+        <button id="proposal-accept-btn" class="btn btn-primary btn-full">
+          <span>📤</span>
+          Accept & Send
+        </button>
+      </div>
+    </footer>
+  `;
+
+  // Add initial styling for animation
+  overlay.style.opacity = '0';
+  overlay.style.transform = 'translateY(20px)';
+  overlay.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+  
+  // Add to document
+  document.body.appendChild(overlay);
+  
+  // Debug logging
+  console.log('Proposal overlay created and added to DOM');
+  
+  // Update word count initially
+  setTimeout(() => updateProposalWordCount(), 100);
+  
+  // Add event listeners to the overlay elements
+  setupProposalOverlayEventListeners(overlay, jobTitle, jobUrl);
+  
+  // Show overlay with animation
+  setTimeout(() => {
+    overlay.classList.remove('hidden');
+    overlay.style.opacity = '1';
+    overlay.style.transform = 'translateY(0)';
+    console.log('Proposal overlay should now be visible');
+    
+    // Add keyboard listener for Escape key
+    const handleKeyPress = (e) => {
+      if (e.key === 'Escape') {
+        closeProposalOverlay();
+        document.removeEventListener('keydown', handleKeyPress);
+      }
+    };
+    document.addEventListener('keydown', handleKeyPress);
+    
+    // Store the handler so we can remove it later
+    overlay.keyHandler = handleKeyPress;
+  }, 50);
+}
+
+// Generate personalized proposal based on job title
+function generatePersonalizedProposal(jobTitle) {
+  const skills = extractSkillsFromJobTitle(jobTitle);
+  
+  return `Hello,
+
+I am writing to express my strong interest in the "${jobTitle}" position. With extensive experience in ${skills.join(', ')}, I am confident I can deliver exceptional results for your project.
+
+**Why I'm the right fit:**
+• Proven expertise in ${skills[0] || 'web development'} with a track record of successful projects
+• Strong problem-solving skills and attention to detail
+• Excellent communication and ability to work independently
+• Committed to delivering high-quality code and meeting deadlines
+
+**My approach:**
+1. Thoroughly understand your project requirements and goals
+2. Provide regular updates and maintain clear communication
+3. Write clean, maintainable, and well-documented code
+4. Ensure thorough testing and quality assurance
+
+I would love to discuss your project in more detail and show you examples of my relevant work. I'm available for a quick call at your convenience.
+
+Thank you for considering my proposal. I look forward to the opportunity to contribute to your project's success.
+
+Best regards,
+[Your Name]`;
+}
+
+// Extract skills from job title
+function extractSkillsFromJobTitle(title) {
+  const commonSkills = [
+    'React', 'TypeScript', 'JavaScript', 'Vue.js', 'Angular',
+    'Node.js', 'Python', 'PHP', 'Ruby', 'Rails',
+    'HTML', 'CSS', 'SCSS', 'Tailwind', 'Bootstrap',
+    'MongoDB', 'PostgreSQL', 'MySQL', 'Redis',
+    'AWS', 'Docker', 'Kubernetes', 'Git'
+  ];
+  
+  const foundSkills = commonSkills.filter(skill => 
+    title.toLowerCase().includes(skill.toLowerCase())
+  );
+  
+  return foundSkills.length > 0 ? foundSkills : ['web development'];
+}
+
+// Setup event listeners for proposal overlay
+function setupProposalOverlayEventListeners(overlay, jobTitle, jobUrl) {
+  // Back button
+  const backBtn = overlay.querySelector('#proposal-back-btn');
+  if (backBtn) {
+    backBtn.addEventListener('click', closeProposalOverlay);
+  }
+
+  // Template select
+  const templateSelect = overlay.querySelector('#proposal-template-select');
+  if (templateSelect) {
+    templateSelect.addEventListener('change', handleProposalTemplateChange);
+  }
+
+  // Textarea input for word count
+  const textarea = overlay.querySelector('#proposal-textarea');
+  if (textarea) {
+    textarea.addEventListener('input', updateProposalWordCount);
+  }
+
+  // Proofread button
+  const proofreadBtn = overlay.querySelector('#proposal-proofread-btn');
+  if (proofreadBtn) {
+    proofreadBtn.addEventListener('click', proofreadProposalText);
+  }
+
+  // Reject button
+  const rejectBtn = overlay.querySelector('#proposal-reject-btn');
+  if (rejectBtn) {
+    rejectBtn.addEventListener('click', rejectProposalOverlay);
+  }
+
+  // Regenerate button
+  const regenerateBtn = overlay.querySelector('#proposal-regenerate-btn');
+  if (regenerateBtn) {
+    regenerateBtn.addEventListener('click', () => regenerateProposalOverlay(jobTitle));
+  }
+
+  // Accept button
+  const acceptBtn = overlay.querySelector('#proposal-accept-btn');
+  if (acceptBtn) {
+    acceptBtn.addEventListener('click', () => acceptAndSendProposal(jobUrl));
+  }
+
+  console.log('Proposal overlay event listeners setup complete');
+}
+
+// Proposal overlay functions
+function closeProposalOverlay() {
+  const overlay = document.getElementById('proposal-overlay');
+  if (overlay) {
+    // Remove keyboard event listener if it exists
+    if (overlay.keyHandler) {
+      document.removeEventListener('keydown', overlay.keyHandler);
+    }
+    
+    // Add fade out animation
+    overlay.style.opacity = '0';
+    overlay.style.transform = 'translateY(10px)';
+    overlay.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+    
+    setTimeout(() => {
+      overlay.remove();
+      console.log('Proposal overlay closed');
+    }, 300);
+  }
+}
+
+function updateProposalWordCount() {
+  const textarea = document.getElementById('proposal-textarea');
+  const wordsElement = document.getElementById('proposal-words');
+  const charsElement = document.getElementById('proposal-chars');
+  
+  if (!textarea || !wordsElement || !charsElement) return;
+  
+  const text = textarea.value;
+  const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+  const characters = text.length;
+  
+  wordsElement.textContent = `${words} Words`;
+  charsElement.textContent = `${characters} Characters`;
+}
+
+function handleProposalTemplateChange() {
+  const select = document.getElementById('proposal-template-select');
+  const textarea = document.getElementById('proposal-textarea');
+  
+  if (!select || !textarea) return;
+  
+  const templates = {
+    template1: `Dear Hiring Manager,
+
+I am excited to submit my proposal for your project. With extensive experience in modern web development, I have successfully delivered numerous projects that align perfectly with your requirements.
+
+**What I bring to your project:**
+• Expert-level proficiency in the required technologies
+• Strong understanding of best practices and industry standards
+• Proven track record of delivering projects on time and within budget
+• Excellent communication and project management skills
+
+**My approach:**
+1. Thorough analysis of your project requirements
+2. Clean, maintainable code following industry best practices
+3. Regular communication and progress updates
+4. Comprehensive testing and quality assurance
+
+I would love to discuss how my expertise can contribute to your project's success.
+
+Best regards,
+[Your Name]`,
+
+    template2: `Hi there!
+
+I just saw your posting and I'm very interested!
+
+**Quick highlights:**
+• Extensive experience in the required technologies
+• Available to start immediately
+• Strong portfolio of similar projects
+• Excellent communication & fast turnaround
+
+I'd love to chat about your project requirements. When would be a good time for a brief call?
+
+Looking forward to working together!
+
+[Your Name]`,
+
+    template3: `Hello,
+
+As a specialist with deep expertise in modern web development, I'm confident I'm the perfect fit for your project.
+
+**My expertise includes:**
+• Advanced development patterns and best practices
+• Performance optimization and scalability
+• Modern tooling and development workflows
+• Comprehensive testing and quality assurance
+
+**Recent relevant work:**
+• Built scalable applications serving thousands of users
+• Implemented complex features with high performance
+• Delivered projects with 99% uptime and excellent user feedback
+
+I'm excited about the opportunity to bring my expertise to your team.
+
+Best regards,
+[Your Name]`
+  };
+  
+  const templateKey = select.value;
+  
+  if (templateKey && templates[templateKey]) {
+    textarea.value = templates[templateKey];
+    updateProposalWordCount();
+    showNotification('Template applied successfully!', 'success');
+  }
+}
+
+function proofreadProposalText() {
+  const textarea = document.getElementById('proposal-textarea');
+  if (!textarea) return;
+  
+  const text = textarea.value;
+  if (!text.trim()) {
+    showNotification('Please enter some text to proofread', 'warning');
+    return;
+  }
+  
+  const suggestions = [];
+  
+  // Check for common issues
+  if (text.includes('[') && text.includes(']')) {
+    suggestions.push('• Replace placeholder text in brackets [like this]');
+  }
+  
+  if (!text.includes('Best regards') && !text.includes('Sincerely') && !text.includes('Thank you')) {
+    suggestions.push('• Consider adding a professional closing');
+  }
+  
+  if (text.length < 200) {
+    suggestions.push('• Proposal might be too short - consider adding more details');
+  }
+  
+  if (text.length > 2000) {
+    suggestions.push('• Proposal might be too long - consider being more concise');
+  }
+  
+  if (suggestions.length === 0) {
+    showNotification('✓ No obvious issues found!', 'success');
+  } else {
+    alert(`Proofreading suggestions:\n\n${suggestions.join('\n')}`);
+  }
+}
+
+function regenerateProposalOverlay(jobTitle) {
+  const confirmRegenerate = confirm('Are you sure you want to regenerate the proposal?\n\nThis will replace your current text with a new AI-generated version.');
+  
+  if (confirmRegenerate) {
+    const textarea = document.getElementById('proposal-textarea');
+    if (textarea) {
+      showNotification('Regenerating proposal...', 'info');
+      
+      setTimeout(() => {
+        const newProposal = generateAlternativeProposal(jobTitle);
+        textarea.value = newProposal;
+        updateProposalWordCount();
+        showNotification('New proposal generated!', 'success');
+      }, 1500);
+    }
+  }
+}
+
+function generateAlternativeProposal(jobTitle) {
+  const alternatives = [
+    `Dear Client,
+
+I'm excited about your ${jobTitle} position and believe I'm an excellent match for your requirements.
+
+**My qualifications:**
+• Extensive experience in modern web development
+• Strong portfolio of successful projects
+• Excellent communication and project management skills
+• Commitment to quality and timely delivery
+
+**What you can expect:**
+- Professional, clean code following best practices
+- Regular progress updates and transparent communication
+- Thorough testing and quality assurance
+- Post-delivery support and documentation
+
+I'd be happy to discuss your project requirements in detail.
+
+Looking forward to collaborating with you!
+
+Best regards,
+[Your Name]`,
+
+    `Hi there!
+
+Your ${jobTitle} position caught my attention, and I'm confident I can deliver exactly what you're looking for.
+
+**Why choose me:**
+• Proven track record with similar projects
+• Fast turnaround without compromising quality
+• Proactive communication throughout the project
+• Competitive pricing with exceptional value
+
+I'm available to start immediately and would love to discuss your specific needs.
+
+Best,
+[Your Name]`
+  ];
+  
+  return alternatives[Math.floor(Math.random() * alternatives.length)];
+}
+
+function rejectProposalOverlay() {
+  const confirmReject = confirm('Are you sure you want to reject this proposal?\n\nThis will close the proposal review and return to the job list.');
+  
+  if (confirmReject) {
+    showNotification('Proposal rejected', 'info');
+    closeProposalOverlay();
+  }
+}
+
+async function acceptAndSendProposal(jobUrl) {
+  const textarea = document.getElementById('proposal-textarea');
+  if (!textarea || !textarea.value.trim()) {
+    showNotification('Please enter a proposal before sending', 'warning');
+    return;
+  }
+  
+  const confirmSend = confirm('Ready to send this proposal?\n\nThis will open Upwork in a new tab with your proposal ready to submit.');
+  
+  if (confirmSend) {
+    // Copy proposal to clipboard
+    try {
+      await navigator.clipboard.writeText(textarea.value);
+      showNotification('Proposal copied to clipboard!', 'success');
+    } catch (error) {
+      console.log('Could not copy to clipboard:', error);
+    }
+    
+    // Open Upwork job page if available
+    if (jobUrl && jobUrl !== '#') {
+      chrome.tabs.create({ url: jobUrl });
+    }
+    
+    showNotification('Opening Upwork... Paste your proposal and submit!', 'success');
+    closeProposalOverlay();
+  }
 }
 
 // Handle extension-specific events

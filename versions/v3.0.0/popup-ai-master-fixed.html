@@ -93,6 +93,12 @@
 
     .header-button:hover {
       background-color: rgba(56, 224, 123, 0.1);
+      transform: scale(1.05);
+      transition: all 0.2s ease;
+    }
+
+    .header-button:active {
+      transform: scale(0.95);
     }
 
     .header-title {
@@ -403,9 +409,33 @@
     .icon-description::before { content: '📄'; }
     .icon-history::before { content: '📋'; }
     .icon-notifications::before { content: '🔔'; }
-
     .hidden {
       display: none !important;
+    }
+
+    /* Screen overlay for proposal review */
+    .screen-overlay {
+      position: fixed;
+      inset: 0;
+      background-color: var(--current-bg);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .screen-overlay.hidden {
+      display: none;
+    }
+
+    .screen-content {
+      flex-grow: 1;
+      padding: 1rem;
+      overflow-y: auto;
+    }
+
+    .screen-section {
+      margin-bottom: 1.5rem;
     }
 
     /* Dark mode media query fallback */
@@ -418,15 +448,23 @@
       }
       
       :root:not([data-theme="light"]) .header {
-        background-color: rgba(18, 32, 23, 0.95);
+        background-color: rgba(18, 32, 23, 0.8);
       }
       
       :root:not([data-theme="light"]) .footer {
-        background-color: rgba(18, 32, 23, 0.95);
+        background-color: rgba(18, 32, 23, 0.8);
       }
       
       :root:not([data-theme="light"]) .job-card.featured {
         background-color: rgba(56, 224, 123, 0.2);
+      }
+      
+      :root:not([data-theme="light"]) .btn-secondary {
+        background-color: rgba(156, 163, 175, 0.2);
+      }
+      
+      :root:not([data-theme="light"]) .toggle-label {
+        background-color: #374151;
       }
     }
   </style>

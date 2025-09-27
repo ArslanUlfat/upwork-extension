@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Upwork Scraper - Proposal Review</title>
+  
+  <!-- Google Fonts -->
+  <link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+  
+  <style>
+    /* CSS Variables for theming - matching v3.0.0 system */
+    :root {
+      --primary-color: #38e07b;
+      --background-light: #f6f8f7;
+      --background-dark: #122017;
+      --content-light: #122017;
+      --content-dark: #f6f8f7;
+      --subtle-light: #4b5563;
+      --subtle-dark: #9ca3af;
+      --border-light: #e5e7eb;
+      --border-dark: #374151;
+      --blue-500: #3b82f6;
+      --yellow-400: #fbbf24;
+      --red-500: #ef4444;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    /* Dark mode variables */
+    [data-theme="dark"] {
+      --current-bg: var(--background-dark);
+      --current-content: var(--content-dark);
+      --current-subtle: var(--subtle-dark);
+      --current-border: var(--border-dark);
+    }
+
+    /* Light mode variables (default) */
+    [data-theme="light"], :root {
+      --current-bg: var(--background-light);
+      --current-content: var(--content-light);
+      --current-subtle: var(--subtle-light);
+      --current-border: var(--border-light);
+    }
+
+    /* Base styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--current-bg);
+      color: var(--current-content);
+      width: 400px;
+      min-height: 600px;
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+
+    /* Material Icons */
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      font-family: 'Material Symbols Outlined', 'Material Icons', sans-serif;
+      font-weight: normal;
+      font-style: normal;
+      font-size: 24px;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      -webkit-font-feature-settings: 'liga';
+      font-feature-settings: 'liga';
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Layout */
+    .main-container {
+      display: flex;
+      flex-direction: column;
+      min-height: 600px;
+      height: 100%;
+    }
+
+    /* Header */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background-color: rgba(246, 248, 247, 0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--current-border);
+    }
+
+    [data-theme="dark"] .header {
+      background-color: rgba(18, 32, 23, 0.95);
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      height: 4rem;
+      padding: 0 1rem;
+    }
+
+    .header-button {
+      padding: 0.5rem;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--current-content);
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .header-button:hover {
+      background-color: rgba(56, 224, 123, 0.1);
+    }
+
+    .header-title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--current-content);
+      margin: 0 auto;
+    }
+
+    .header-spacer {
+      width: 2.25rem;
+      height: 2.25rem;
+    }
+
+    /* Main content */
+    .main-content {
+      flex-grow: 1;
+      padding: 1rem;
+      overflow-y: auto;
+    }
+
+    .section {
+      margin-bottom: 1.5rem;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .ai-icon {
+      padding: 0.5rem;
+      background-color: rgba(59, 130, 246, 0.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ai-icon svg {
+      width: 1.5rem;
+      height: 1.5rem;
+      color: var(--blue-500);
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--current-content);
+    }
+
+    .section-description {
+      font-size: 0.875rem;
+      color: var(--current-subtle);
+      margin-bottom: 1rem;
+      line-height: 1.6;
+    }
+
+    /* Form elements */
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--current-content);
+      margin-bottom: 0.5rem;
+    }
+
+    .select-container {
+      position: relative;
+    }
+
+    .select-field {
+      width: 100%;
+      padding: 0.5rem 2.5rem 0.5rem 2.5rem;
+      background-color: var(--current-bg);
+      border: 1px solid var(--current-border);
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      color: var(--current-content);
+      cursor: pointer;
+      appearance: none;
+    }
+
+    .select-field:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(56, 224, 123, 0.2);
+    }
+
+    .select-icon-left {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--current-subtle);
+      pointer-events: none;
+    }
+
+    .select-icon-right {
+      position: absolute;
+      right: 0.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--current-content);
+      pointer-events: none;
+    }
+
+    /* Proposal container */
+    .proposal-container {
+      background-color: var(--current-bg);
+      border: 1px solid var(--current-border);
+      border-radius: 0.5rem;
+      padding: 1rem;
+    }
+
+    .proposal-subject {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--current-content);
+      margin-bottom: 0.5rem;
+    }
+
+    .proposal-textarea {
+      width: 100%;
+      background-color: var(--current-bg);
+      border: 1px solid var(--current-border);
+      border-radius: 0.5rem;
+      padding: 0.75rem;
+      font-size: 0.875rem;
+      color: var(--current-content);
+      line-height: 1.6;
+      resize: vertical;
+      min-height: 16rem;
+      font-family: var(--font-family);
+    }
+
+    .proposal-textarea:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(56, 224, 123, 0.2);
+    }
+
+    .proposal-textarea::placeholder {
+      color: var(--current-subtle);
+    }
+
+    .proposal-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 0.5rem;
+    }
+
+    .proofread-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--blue-500);
+      background: none;
+      border: none;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .proofread-btn:hover {
+      color: #1d4ed8;
+    }
+
+    .word-count {
+      font-size: 0.75rem;
+      color: var(--current-subtle);
+      text-align: right;
+    }
+
+    /* Footer */
+    .footer {
+      position: sticky;
+      bottom: 0;
+      background-color: rgba(246, 248, 247, 0.95);
+      backdrop-filter: blur(8px);
+      border-top: 1px solid var(--current-border);
+      padding: 1rem;
+    }
+
+    [data-theme="dark"] .footer {
+      background-color: rgba(18, 32, 23, 0.95);
+    }
+
+    .footer-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      font-family: var(--font-family);
+    }
+
+    .btn-full {
+      width: 100%;
+    }
+
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: var(--background-dark);
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+    }
+
+    .btn-danger {
+      background-color: rgba(239, 68, 68, 0.1);
+      color: var(--danger);
+    }
+
+    .btn-danger:hover {
+      background-color: rgba(239, 68, 68, 0.2);
+    }
+
+    .btn-warning {
+      background-color: rgba(245, 158, 11, 0.1);
+      color: var(--warning);
+    }
+
+    .btn-warning:hover {
+      background-color: rgba(245, 158, 11, 0.2);
+    }
+
+    /* Icon fallbacks */
+    .icon {
+      width: 24px;
+      height: 24px;
+      display: inline-block;
+      text-align: center;
+      line-height: 24px;
+    }
+
+    .icon-back::before { content: '←'; }
+    .icon-ai::before { content: '🤖'; }
+    .icon-template::before { content: '📄'; }
+    .icon-expand::before { content: '▼'; }
+    .icon-spellcheck::before { content: '✓'; }
+    .icon-close::before { content: '✕'; }
+    .icon-refresh::before { content: '🔄'; }
+    .icon-send::before { content: '📤'; }
+
+    /* Dark mode media query fallback */
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --current-bg: var(--background-dark);
+        --current-content: var(--content-dark);
+        --current-subtle: var(--subtle-dark);
+        --current-border: var(--border-dark);
+      }
+      
+      :root:not([data-theme="light"]) .header {
+        background-color: rgba(18, 32, 23, 0.95);
+      }
+      
+      :root:not([data-theme="light"]) .footer {
+        background-color: rgba(18, 32, 23, 0.95);
+      }
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 400px) {
+      .main-content {
+        padding: 0.75rem;
+      }
+      
+      .footer {
+        padding: 0.75rem;
+      }
+      
+      .button-row {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body data-theme="light">
+  <div class="main-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-content">
+        <button class="header-button" onclick="goBack()">
+          <span class="material-symbols-outlined">arrow_back</span>
+        </button>
+        <h1 class="header-title">Proposal Review</h1>
+        <div class="header-spacer"></div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- AI Generated Section -->
+      <section class="section">
+        <div class="section-header">
+          <div class="ai-icon">
+            <svg fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6.012 17.29a1.05 1.05 0 0 0 1.05-1.05c0-2.88 2.34-5.22 5.22-5.22a1.05 1.05 0 0 0 0-2.1c-4.05 0-7.32 3.27-7.32 7.32 0 .57.48 1.05 1.05 1.05zm-.15-5.61a1.05 1.05 0 0 0 1.05-1.05c0-1.74 1.41-3.15 3.15-3.15a1.05 1.05 0 1 0 0-2.1c-2.91 0-5.25 2.34-5.25 5.25 0 .57.48 1.05 1.05 1.05zm12.42 5.61a1.05 1.05 0 0 0-1.05 1.05c0 2.88-2.34 5.22-5.22 5.22a1.05 1.05 0 1 0 0 2.1c4.05 0 7.32-3.27 7.32-7.32 0-.57-.48-1.05-1.05-1.05zm.15-5.61a1.05 1.05 0 0 0-1.05 1.05c0 1.74-1.41 3.15-3.15 3.15a1.05 1.05 0 0 0 0 2.1c2.91 0 5.25-2.34 5.25-5.25 0-.57-.48-1.05-1.05-1.05z"></path>
+            </svg>
+          </div>
+          <h2 class="section-title">AI Generated Proposal</h2>
+        </div>
+        <p class="section-description">
+          Review the AI-generated proposal below for the job. You can make edits before sending.
+        </p>
+      </section>
+
+      <!-- Template Selection -->
+      <section class="section">
+        <div class="form-group">
+          <label class="form-label" for="template-select">Use a template</label>
+          <div class="select-container">
+            <select class="select-field" id="template-select" onchange="handleTemplateChange()">
+              <option value="">No Template</option>
+              <option value="template1">Standard Frontend Proposal</option>
+              <option value="template2">Quick Intro Template</option>
+              <option value="template3">React Specialist Template</option>
+            </select>
+            <span class="material-symbols-outlined select-icon-left">description</span>
+            <span class="material-symbols-outlined select-icon-right">expand_more</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Proposal Content -->
+      <section class="section">
+        <div class="proposal-container">
+          <h3 class="proposal-subject" id="proposal-subject">Subject: Proposal for Senior Frontend Developer Position</h3>
+          <textarea 
+            class="proposal-textarea" 
+            id="proposal-text" 
+            placeholder="Your proposal will appear here..."
+            oninput="updateWordCount()"
+          >Hello,
+
+I am writing to express my keen interest in the Senior Frontend Developer position I saw advertised on Upwork. With over 8 years of experience in frontend development, specializing in React and TypeScript, I am confident that I possess the skills and expertise you are looking for.
+
+My portfolio showcases a range of projects where I have successfully built and maintained complex, high-performance web applications. I am particularly proud of my work on [mention a relevant project], where I led the development of a responsive and scalable UI, resulting in a 20% increase in user engagement.
+
+I am a dedicated and collaborative team player, passionate about writing clean, maintainable code and adhering to modern frontend best practices. I am excited by the opportunity to contribute to your team and help build outstanding user experiences.
+
+Thank you for your time and consideration. I look forward to hearing from you soon.
+
+Best regards,
+[Your Name]</textarea>
+          
+          <div class="proposal-footer">
+            <button class="proofread-btn" onclick="proofreadProposal()">
+              <span class="material-symbols-outlined">spellcheck</span>
+              Proofread
+            </button>
+            <div class="word-count" id="word-count">
+              <span id="word-count-text">189 Words</span> / <span id="char-count-text">1048 Characters</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer Actions -->
+    <footer class="footer">
+      <div class="footer-actions">
+        <div class="button-row">
+          <button class="btn btn-danger btn-full" onclick="rejectProposal()">
+            <span class="material-symbols-outlined">close</span>
+            Reject
+          </button>
+          <button class="btn btn-warning btn-full" onclick="regenerateProposal()">
+            <span class="material-symbols-outlined">refresh</span>
+            Regenerate
+          </button>
+        </div>
+        <button class="btn btn-primary btn-full" onclick="acceptAndSend()">
+          <span class="material-symbols-outlined">send</span>
+          Accept & Send
+        </button>
+      </div>
+    </footer>
+  </div>
+
+  <!-- JavaScript -->
+  <script src="proposal-review.js"></script>
+</body>
+</html>

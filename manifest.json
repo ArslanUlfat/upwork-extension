@@ -48,7 +48,9 @@
         "versions/v3.0.0/popup-ai-master.css",
         "versions/v3.0.0/popup-ai-master.js",
         "versions/v3.0.0/popup-ai-master-fixed.html",
-        "versions/v3.0.0/popup-ai-master-fixed.js"
+        "versions/v3.0.0/popup-ai-master-fixed.js",
+        "versions/v3.0.0/proposal-review.html",
+        "versions/v3.0.0/proposal-review.js"
       ],
       "matches": ["https://www.upwork.com/*"]
     }

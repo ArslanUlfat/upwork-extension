@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "🪄 Magic Upwork Assistant",
-  "version": "2.0.0",
-  "version_name": "Magic Stick Edition",
+  "version": "3.0.0",
+  "version_name": "AI Master Edition",
   "description": "AI-powered job analysis, smart filtering, auto-apply, and market insights for Upwork freelancers",
   "permissions": [
     "activeTab",
@@ -18,14 +18,21 @@
     "https://hooks.slack.com/*"
   ],
   "action": {
-    "default_popup": "versions/v2.0.0/popup-pro.html",
+    "default_popup": "versions/v3.0.0/popup-ai-master-fixed.html",
     "default_title": "Magic Upwork Assistant"
   },
   "content_scripts": [
     {
-      "matches": ["https://www.upwork.com/nx/search/jobs*"],
+      "matches": [
+        "https://www.upwork.com/nx/search/jobs*",
+        "https://www.upwork.com/nx/search/*",
+        "https://www.upwork.com/jobs/*",
+        "https://www.upwork.com/freelance-jobs/*",
+        "https://www.upwork.com/search/jobs*"
+      ],
       "js": ["shared/content.js"],
-      "run_at": "document_end"
+      "run_at": "document_end",
+      "all_frames": false
     }
   ],
   "background": {
@@ -37,12 +44,11 @@
         "shared/version-config.js",
         "shared/version-display.js",
         "shared/version-styles.css",
-        "versions/v1.0.0/popup-basic.html",
-        "versions/v1.0.0/popup-basic.css",
-        "versions/v1.0.0/popup-basic.js",
-        "versions/v2.0.0/popup-pro.html",
-        "versions/v2.0.0/popup-pro.css",
-        "versions/v2.0.0/popup-pro.js"
+        "versions/v3.0.0/popup-ai-master.html",
+        "versions/v3.0.0/popup-ai-master.css",
+        "versions/v3.0.0/popup-ai-master.js",
+        "versions/v3.0.0/popup-ai-master-fixed.html",
+        "versions/v3.0.0/popup-ai-master-fixed.js"
       ],
       "matches": ["https://www.upwork.com/*"]
     }

@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Upwork Scraper - AI Master v3.0.0</title>
+  
+  <!-- Google Fonts -->
+  <link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+  
+  <!-- Critical CSS and Fallbacks -->
+  <style>
+    /* Critical CSS for extension popup */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #f6f8f7;
+      color: #122017;
+      width: 400px;
+      min-height: 600px;
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+    
+    .main-container {
+      display: flex;
+      flex-direction: column;
+      min-height: 600px;
+      height: 100%;
+    }
+    
+    .header {
+      background-color: rgba(246, 248, 247, 0.9);
+      border-bottom: 1px solid #e5e7eb;
+      padding: 0;
+    }
+    
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 4rem;
+      padding: 0 1rem;
+    }
+    
+    .header-title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: #122017;
+    }
+    
+    .main-content {
+      flex-grow: 1;
+      padding: 1rem;
+    }
+    
+    .material-symbols-outlined {
+      font-family: 'Material Symbols Outlined', 'Material Icons', sans-serif;
+      font-weight: normal;
+      font-style: normal;
+      font-size: 24px;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      -webkit-font-feature-settings: 'liga';
+      font-feature-settings: 'liga';
+      -webkit-font-smoothing: antialiased;
+    }
+    
+    /* Fallback if icons don't load */
+    .material-symbols-outlined:empty:before {
+      content: '⚙️';
+      font-family: system-ui;
+    }
+  </style>
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="popup-ai-master.css"/>
+</head>
+
+<body data-theme="light">
+  <div class="main-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <button class="header-button">
+            <span class="material-symbols-outlined">bookmark_border</span>
+          </button>
+          <h1 class="header-title">Job Scraper AI</h1>
+          <button class="header-button" onclick="showScreen('settings-screen')">
+            <span class="material-symbols-outlined">settings</span>
+            <span class="notification-dot"></span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Search Section -->
+      <section class="section">
+        <h2 class="section-title">Find Jobs & Generate Proposals</h2>
+        <div class="form-group">
+          <div class="form-label-row">
+            <label class="form-label" for="keywords">Keywords</label>
+            <button class="link-button">Save Search</button>
+          </div>
+          <input 
+            class="input-field" 
+            id="keywords" 
+            placeholder="e.g., React, Node.js, UI/UX" 
+            type="text" 
+            value="React, UI/UX"
+          />
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="blacklist">Blacklisted Words</label>
+          <input 
+            class="input-field" 
+            id="blacklist" 
+            placeholder="e.g., entry-level, urgent" 
+            type="text"
+          />
+        </div>
+        
+        <div class="btn-row">
+          <button class="btn btn-primary btn-full">Find Jobs</button>
+          <button class="btn btn-blue btn-full" onclick="showDialog('confirmation-dialog')">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6.012 17.29a1.05 1.05 0 0 0 1.05-1.05c0-2.88 2.34-5.22 5.22-5.22a1.05 1.05 0 0 0 0-2.1c-4.05 0-7.32 3.27-7.32 7.32 0 .57.48 1.05 1.05 1.05zm-.15-5.61a1.05 1.05 0 0 0 1.05-1.05c0-1.74 1.41-3.15 3.15-3.15a1.05 1.05 0 1 0 0-2.1c-2.91 0-5.25 2.34-5.25 5.25 0 .57.48 1.05 1.05 1.05zm12.42 5.61a1.05 1.05 0 0 0-1.05 1.05c0 2.88-2.34 5.22-5.22 5.22a1.05 1.05 0 1 0 0 2.1c4.05 0 7.32-3.27 7.32-7.32 0-.57-.48-1.05-1.05-1.05zm.15-5.61a1.05 1.05 0 0 0-1.05 1.05c0 1.74-1.41 3.15-3.15 3.15a1.05 1.05 0 0 0 0 2.1c2.91 0 5.25-2.34 5.25-5.25 0-.57-.48-1.05-1.05-1.05zM17.29 6.012a1.05 1.05 0 0 0-1.05-1.05c-2.88 0-5.22-2.34-5.22-5.22a1.05 1.05 0 1 0-2.1 0c0 4.05 3.27 7.32 7.32 7.32.57 0 1.05-.48 1.05-1.05zm-5.61-.15a1.05 1.05 0 0 0-1.05-1.05c-1.74 0-3.15-1.41-3.15-3.15a1.05 1.05 0 1 0-2.1 0c0 2.91 2.34 5.25 5.25 5.25.57 0 1.05-.48 1.05-1.05zM6.71 18.342a1.05 1.05 0 0 0-1.05 1.05c0 1.74 1.41 3.15 3.15 3.15a1.05 1.05 0 1 0 0 2.1c-2.91 0-5.25-2.34-5.25-5.25 0-.57.48-1.05 1.05-1.05zm-5.61.15a1.05 1.05 0 0 0-1.05 1.05c0 2.88 2.34 5.22 5.22 5.22a1.05 1.05 0 1 0 0-2.1c-1.74 0-3.15-1.41-3.15-3.15 0-.57-.48-1.05-1.05-1.05z"></path>
+            </svg>
+            Auto find and notify on Slack
+          </button>
+        </div>
+      </section>
+
+      <!-- Job Results Section -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">Job Results</h2>
+          <div class="new-jobs-indicator">
+            <span class="material-symbols-outlined">notifications_active</span>
+            <span>3 New Jobs</span>
+          </div>
+        </div>
+        
+        <div class="job-list">
+          <!-- Featured Job -->
+          <div class="job-card featured">
+            <div class="job-header">
+              <h3 class="job-title" onclick="showScreen('job-details-1')">
+                Senior Frontend Developer - React & TypeScript
+              </h3>
+              <button class="bookmark-btn">
+                <span class="material-symbols-outlined">bookmark_border</span>
+              </button>
+            </div>
+            <p class="job-description">
+              We are looking for a skilled React developer to join our team. Must have experience with TypeScript and modern frontend workflows. Long-term project.
+            </p>
+            <div class="job-tags">
+              <span class="job-tag">React</span>
+              <span class="job-tag">TypeScript</span>
+            </div>
+            <button class="btn btn-primary btn-full">Generate Proposal</button>
+          </div>
+
+          <!-- Regular Job -->
+          <div class="job-card">
+            <div class="job-header">
+              <h3 class="job-title" onclick="showScreen('job-details-2')">
+                Full-Stack Developer (Node.js, React)
+              </h3>
+              <button class="bookmark-btn">
+                <span class="material-symbols-outlined">bookmark</span>
+              </button>
+            </div>
+            <p class="job-description">
+              Seeking a versatile full-stack developer to build a new web application. Experience with Node.js for the backend and React for the frontend is required.
+            </p>
+            <div class="job-tags">
+              <span class="job-tag subtle">Node.js</span>
+              <span class="job-tag subtle">React</span>
+            </div>
+            <button class="btn btn-primary btn-full">Generate Proposal</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer Navigation -->
+    <footer class="footer">
+      <nav class="footer-nav">
+        <a class="nav-item active" href="#">
+          <span class="material-symbols-outlined">search</span>
+          <span class="nav-text">Scraper</span>
+          <span class="nav-badge">3</span>
+        </a>
+        <a class="nav-item" href="#">
+          <span class="material-symbols-outlined">description</span>
+          <span class="nav-text">Proposals</span>
+        </a>
+        <a class="nav-item" href="#">
+          <span class="material-symbols-outlined">history</span>
+          <span class="nav-text">History</span>
+        </a>
+      </nav>
+    </footer>
+  </div>
+
+  <!-- Job Details Screen 1 -->
+  <div class="screen-overlay hidden" id="job-details-1">
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <button class="header-button" onclick="hideScreen('job-details-1')">
+            <span class="material-symbols-outlined">arrow_back</span>
+          </button>
+          <h1 class="header-title">Job Details</h1>
+          <button class="header-button">
+            <span class="material-symbols-outlined">bookmark_border</span>
+          </button>
+        </div>
+      </div>
+    </header>
+    
+    <main class="screen-content">
+      <section class="screen-section">
+        <h2 class="section-title">Senior Frontend Developer - React & TypeScript</h2>
+        <div class="job-tags">
+          <span class="job-tag subtle">React</span>
+          <span class="job-tag subtle">TypeScript</span>
+        </div>
+      </section>
+      
+      <section class="screen-section">
+        <h3 class="section-title">Job Description</h3>
+        <p class="job-description">
+          We are seeking a highly skilled Senior Frontend Developer to join our dynamic team. The ideal candidate will have extensive experience in building modern, responsive web applications using React and TypeScript. You will be responsible for developing and maintaining our user-facing features, ensuring high performance and scalability. This is a long-term project with opportunities for growth and to work on cutting-edge technologies.
+        </p>
+      </section>
+      
+      <section class="screen-section">
+        <h3 class="section-title">Client History</h3>
+        <div class="client-rating">
+          <div class="stars">
+            <span class="material-symbols-outlined">star</span>
+            <span class="material-symbols-outlined">star</span>
+            <span class="material-symbols-outlined">star</span>
+            <span class="material-symbols-outlined">star</span>
+            <span class="material-symbols-outlined">star_half</span>
+          </div>
+          <span class="rating-text">4.5 Stars</span>
+          <span class="rating-count">(25 reviews)</span>
+        </div>
+        <p class="client-stats">
+          <span class="highlight">Payment Verified</span>, $20k+ Total Spent, 15 Hires, 5 Active
+        </p>
+      </section>
+      
+      <section class="screen-section">
+        <h3 class="section-title">Attachments</h3>
+        <div class="attachment-item">
+          <span class="material-symbols-outlined attachment-icon">description</span>
+          <div class="attachment-info">
+            <p class="attachment-name">Project_Brief.pdf</p>
+            <p class="attachment-size">1.2 MB</p>
+          </div>
+          <a class="attachment-link" href="#">Download</a>
+        </div>
+      </section>
+    </main>
+    
+    <footer class="footer">
+      <div class="container">
+        <button class="btn btn-primary btn-full">Generate Proposal</button>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Job Details Screen 2 -->
+  <div class="screen-overlay hidden" id="job-details-2">
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <button class="header-button" onclick="hideScreen('job-details-2')">
+            <span class="material-symbols-outlined">arrow_back</span>
+          </button>
+          <h1 class="header-title">Job Details</h1>
+          <button class="header-button">
+            <span class="material-symbols-outlined">bookmark</span>
+          </button>
+        </div>
+      </div>
+    </header>
+    
+    <main class="screen-content">
+      <section class="screen-section">
+        <h2 class="section-title">Full-Stack Developer (Node.js, React)</h2>
+        <div class="job-tags">
+          <span class="job-tag subtle">Node.js</span>
+          <span class="job-tag subtle">React</span>
+        </div>
+      </section>
+      
+      <section class="screen-section">
+        <h3 class="section-title">Job Description</h3>
+        <p class="job-description">
+          We are looking for a versatile Full-Stack Developer to build a new web application from the ground up. The ideal candidate must be proficient in both frontend and backend development, with strong experience in Node.js for server-side logic and React for creating a dynamic user interface. You will be a key player in the entire development lifecycle, from concept to deployment.
+        </p>
+      </section>
+      
+      <section class="screen-section">
+        <h3 class="section-title">Client History</h3>
+        <div class="client-rating">
+          <div class="stars">
+            <span class="material-symbols-outlined">star</span>
+            <span class="material-symbols-outlined">star</span>
+            <span class="material-symbols-outlined">star</span>
+            <span class="material-symbols-outlined">star</span>
+            <span class="material-symbols-outlined">star</span>
+          </div>
+          <span class="rating-text">5.0 Stars</span>
+          <span class="rating-count">(12 reviews)</span>
+        </div>
+        <p class="client-stats">
+          <span class="highlight">Payment Verified</span>, $50k+ Total Spent, 8 Hires, 2 Active
+        </p>
+      </section>
+      
+      <section class="screen-section">
+        <h3 class="section-title">Attachments</h3>
+        <p class="job-description">No attachments for this job.</p>
+      </section>
+    </main>
+    
+    <footer class="footer">
+      <div class="container">
+        <button class="btn btn-primary btn-full">Generate Proposal</button>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Settings Screen -->
+  <div class="screen-overlay hidden" id="settings-screen">
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <button class="header-button" onclick="hideScreen('settings-screen')">
+            <span class="material-symbols-outlined">arrow_back</span>
+          </button>
+          <h1 class="header-title">Settings</h1>
+          <div style="width: 2.25rem; height: 2.25rem;"></div>
+        </div>
+      </div>
+    </header>
+    
+    <main class="screen-content">
+      <section class="screen-section">
+        <h2 class="section-title">Notification Preferences</h2>
+        
+        <div class="setting-item">
+          <label class="setting-label" for="desktop-notifications">Desktop Notifications</label>
+          <div class="toggle-container">
+            <input 
+              checked="" 
+              class="toggle-checkbox" 
+              id="desktop-notifications" 
+              name="toggle" 
+              type="checkbox"
+            />
+            <label class="toggle-label" for="desktop-notifications"></label>
+          </div>
+        </div>
+        
+        <div class="setting-item">
+          <label class="setting-label" for="sound-alerts">Sound Alerts</label>
+          <div class="toggle-container">
+            <input 
+              class="toggle-checkbox" 
+              id="sound-alerts" 
+              name="toggle" 
+              type="checkbox"
+            />
+            <label class="toggle-label" for="sound-alerts"></label>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="notification-sound">Notification Sound</label>
+          <select class="select-field" id="notification-sound">
+            <option>Default</option>
+            <option>Chime</option>
+            <option>Alert</option>
+            <option>Ping</option>
+          </select>
+        </div>
+      </section>
+      
+      <section class="screen-section">
+        <h2 class="section-title">Theme Settings</h2>
+        <div class="setting-item">
+          <label class="setting-label" for="dark-mode">Dark Mode</label>
+          <div class="toggle-container">
+            <input 
+              class="toggle-checkbox" 
+              id="dark-mode" 
+              name="toggle" 
+              type="checkbox"
+              onchange="toggleTheme()"
+            />
+            <label class="toggle-label" for="dark-mode"></label>
+          </div>
+        </div>
+      </section>
+      
+      <section class="screen-section">
+        <h2 class="section-title">Saved Searches</h2>
+        <div class="saved-search-card">
+          <div class="saved-search-header">
+            <h3 class="saved-search-title">React, UI/UX</h3>
+            <button class="delete-btn">
+              <span class="material-symbols-outlined">delete</span>
+            </button>
+          </div>
+          <p class="saved-search-info">Notifications: On</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Confirmation Dialog -->
+  <div class="dialog-overlay hidden" id="confirmation-dialog">
+    <div class="dialog-content">
+      <div class="dialog-header">
+        <span class="material-symbols-outlined dialog-icon">auto_awesome</span>
+        <h2 class="dialog-title">Activate Auto Job Finder?</h2>
+      </div>
+      
+      <p class="dialog-description">
+        This feature will automatically search for new jobs based on your saved keywords every 15 minutes and send a notification to your connected Slack workspace.
+      </p>
+      
+      <div class="dialog-features">
+        <div class="dialog-feature">
+          <span class="material-symbols-outlined dialog-feature-icon">check_circle</span>
+          <p class="dialog-feature-text">
+            <span class="bold">What it does:</span> Continuously scrapes for new jobs.
+          </p>
+        </div>
+        <div class="dialog-feature">
+          <span class="material-symbols-outlined dialog-feature-icon">timer</span>
+          <p class="dialog-feature-text">
+            <span class="bold">Frequency:</span> Runs every 15 minutes.
+          </p>
+        </div>
+        <div class="dialog-feature">
+          <span class="material-symbols-outlined dialog-feature-icon">key</span>
+          <p class="dialog-feature-text">
+            <span class="bold">Permissions:</span> Requires access to your Slack to send notifications.
+          </p>
+        </div>
+      </div>
+      
+      <div class="dialog-actions">
+        <button class="btn btn-secondary btn-full" onclick="hideDialog('confirmation-dialog')">
+          Cancel
+        </button>
+        <button class="btn btn-blue btn-full" onclick="hideDialog('confirmation-dialog')">
+          Confirm
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script src="popup-ai-master.js"></script>
+</body>
+</html>

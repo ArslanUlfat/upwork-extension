@@ -10,18 +10,62 @@ class UpworkScraper {
     console.log('Starting to scrape Upwork jobs for:', searchQuery);
     
     const jobs = [];
-    const jobElements = document.querySelectorAll('[data-test="job-tile"], [data-test="JobTile"], .job-tile, .up-card-section');
     
-    console.log(`Found ${jobElements.length} potential job elements`);
+    // Wait for page to be fully loaded
+    if (document.readyState !== 'complete') {
+      console.log('Page not fully loaded, waiting...');
+      return [];
+    }
+
+    // Updated selectors for modern Upwork (2024/2025)
+    const jobSelectors = [
+      'article[data-ev-label="search_result_impression"]',
+      'section[data-test="JobTile"]',
+      'div[data-test="job-tile"]',
+      'article[data-test="job-tile"]',
+      '.job-tile',
+      '.up-card-section',
+      'article.job-tile',
+      '[data-cy="job-tile"]',
+      'div[data-cy="job-tile"]'
+    ];
+
+    let jobElements = [];
+    
+    // Try each selector until we find elements
+    for (const selector of jobSelectors) {
+      jobElements = document.querySelectorAll(selector);
+      if (jobElements.length > 0) {
+        console.log(`Found ${jobElements.length} job elements using selector: ${selector}`);
+        break;
+      }
+    }
+    
+    if (jobElements.length === 0) {
+      console.log('No job elements found with primary selectors, trying fallback...');
+      // Fallback: look for any article or section that might contain job info
+      jobElements = document.querySelectorAll('article, section[class*="job"], div[class*="job"]');
+      console.log(`Fallback found ${jobElements.length} potential elements`);
+    }
 
     jobElements.forEach((element, index) => {
       try {
+        // Add safety check for element accessibility
+        if (!element || !element.textContent) {
+          console.log(`Skipping empty element ${index}`);
+          return;
+        }
+
         const job = this.extractJobData(element, searchQuery);
-        if (job && job.title) {
+        if (job && job.title && job.title.length > 3) {
           jobs.push(job);
+          console.log(`Successfully extracted job ${index}: ${job.title}`);
+        } else {
+          console.log(`Job ${index} failed validation:`, job?.title || 'No title');
         }
       } catch (error) {
-        console.error(`Error extracting job ${index}:`, error);
+        console.error(`Error extracting job ${index}:`, error.message || error);
+        // Continue with next job instead of failing completely
       }
     });
 
@@ -55,64 +99,146 @@ class UpworkScraper {
       searchQuery: searchQuery
     };
 
-    // Extract title
-    const titleSelectors = [
-      'h4 a', 'h3 a', 'h2 a',
-      '[data-test="job-title"] a',
-      '.job-tile-title a',
-      '.up-n-link',
-      'a[href*="/jobs/"]'
-    ];
+    try {
+      // Extract title with updated selectors for modern Upwork
+      const titleSelectors = [
+        'h2 a[data-test="job-title-link"]',
+        'h3 a[data-test="job-title-link"]',
+        'h4 a[data-test="job-title-link"]',
+        'a[data-test="job-title-link"]',
+        'h2 a', 'h3 a', 'h4 a', 'h5 a',
+        '[data-test="job-title"] a',
+        '.job-tile-title a',
+        '.up-n-link',
+        'a[href*="/jobs/"]',
+        'a[href*="~"]' // Upwork job URLs often contain ~
+      ];
 
-    for (const selector of titleSelectors) {
-      const titleElement = element.querySelector(selector);
-      if (titleElement) {
-        job.title = this.cleanText(titleElement.textContent);
-        job.url = this.makeAbsoluteUrl(titleElement.href);
-        break;
+      for (const selector of titleSelectors) {
+        try {
+          const titleElement = element.querySelector(selector);
+          if (titleElement && titleElement.textContent && titleElement.textContent.trim()) {
+            job.title = this.cleanText(titleElement.textContent);
+            job.url = this.makeAbsoluteUrl(titleElement.getAttribute('href'));
+            break;
+          }
+        } catch (e) {
+          console.log(`Error with title selector ${selector}:`, e.message);
+          continue;
+        }
       }
+
+      // If no title found with links, try text-only selectors
+      if (!job.title) {
+        const textTitleSelectors = [
+          'h2[data-test="job-title"]',
+          'h3[data-test="job-title"]',
+          'h4[data-test="job-title"]',
+          '.job-tile-title',
+          'h2', 'h3', 'h4', 'h5'
+        ];
+
+        for (const selector of textTitleSelectors) {
+          try {
+            const titleElement = element.querySelector(selector);
+            if (titleElement && titleElement.textContent && titleElement.textContent.trim().length > 5) {
+              job.title = this.cleanText(titleElement.textContent);
+              // Try to find URL separately
+              const linkElement = element.querySelector('a[href*="/jobs/"], a[href*="~"]');
+              if (linkElement) {
+                job.url = this.makeAbsoluteUrl(linkElement.getAttribute('href'));
+              }
+              break;
+            }
+          } catch (e) {
+            console.log(`Error with text title selector ${selector}:`, e.message);
+            continue;
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error extracting title:', error.message);
     }
 
-    // Extract budget/price
-    const budgetSelectors = [
-      '[data-test="budget"]',
-      '.budget',
-      '.up-card-label',
-      'strong:contains("$")',
-      '*[class*="budget"]',
-      '*[class*="price"]'
-    ];
-
-    job.budget = this.extractBudgetFromElement(element);
-
-    // Extract description
-    const descriptionSelectors = [
-      '[data-test="job-description"]',
-      '.job-tile-description',
-      '.up-card-body',
-      'p',
-      '.description'
-    ];
-
-    for (const selector of descriptionSelectors) {
-      const descElement = element.querySelector(selector);
-      if (descElement && descElement.textContent.length > 50) {
-        job.description = this.cleanText(descElement.textContent).substring(0, 200) + '...';
-        break;
-      }
+    // Extract budget/price safely
+    try {
+      job.budget = this.extractBudgetFromElement(element);
+    } catch (error) {
+      console.log('Error extracting budget:', error.message);
+      job.budget = 'Not specified';
     }
 
-    // Extract skills
-    job.skills = this.extractSkills(element);
+    // Extract description safely
+    try {
+      const descriptionSelectors = [
+        '[data-test="job-description"]',
+        '[data-test="description"]',
+        '.job-tile-description',
+        '.up-card-body',
+        'div[data-test="job-description-text"]',
+        'p:not(:empty)',
+        '.description'
+      ];
 
-    // Extract posted time
-    job.postedTime = this.extractPostedTime(element);
+      for (const selector of descriptionSelectors) {
+        try {
+          const descElement = element.querySelector(selector);
+          if (descElement && descElement.textContent && descElement.textContent.trim().length > 30) {
+            job.description = this.cleanText(descElement.textContent).substring(0, 200) + '...';
+            break;
+          }
+        } catch (e) {
+          continue;
+        }
+      }
 
-    // Extract proposals count
-    job.proposals = this.extractProposals(element);
+      // Fallback: get description from any substantial text block
+      if (!job.description) {
+        const allText = this.cleanText(element.textContent);
+        if (allText.length > 100) {
+          // Find the longest sentence that's not the title
+          const sentences = allText.split('.').filter(s => 
+            s.length > 30 && 
+            !job.title || !s.includes(job.title)
+          );
+          if (sentences.length > 0) {
+            job.description = sentences[0].substring(0, 200) + '...';
+          }
+        }
+      }
+    } catch (error) {
+      console.log('Error extracting description:', error.message);
+      job.description = 'Description not available';
+    }
 
-    // Extract client info
-    job.clientInfo = this.extractClientInfo(element);
+    // Extract other data safely
+    try {
+      job.skills = this.extractSkills(element);
+    } catch (error) {
+      console.log('Error extracting skills:', error.message);
+      job.skills = [];
+    }
+
+    try {
+      job.postedTime = this.extractPostedTime(element);
+    } catch (error) {
+      console.log('Error extracting posted time:', error.message);
+      job.postedTime = 'Unknown';
+    }
+
+    try {
+      job.proposals = this.extractProposals(element);
+    } catch (error) {
+      console.log('Error extracting proposals:', error.message);
+      job.proposals = 'Unknown';
+    }
+
+    try {
+      job.clientInfo = this.extractClientInfo(element);
+    } catch (error) {
+      console.log('Error extracting client info:', error.message);
+      job.clientInfo = 'Unknown';
+    }
 
     return job;
   }
@@ -271,11 +397,60 @@ class UpworkScraper {
   makeAbsoluteUrl(url) {
     if (!url) return '#';
     if (url.startsWith('http')) return url;
-    return 'https://www.upwork.com' + url;
+    if (url.startsWith('/')) return 'https://www.upwork.com' + url;
+    return 'https://www.upwork.com/' + url;
   }
 
   generateId() {
     return 'job_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+  }
+
+  // Debug method to analyze page structure
+  debugPageStructure() {
+    console.log('=== UPWORK PAGE STRUCTURE DEBUG ===');
+    console.log('Page URL:', window.location.href);
+    console.log('Page title:', document.title);
+    console.log('Document ready state:', document.readyState);
+    
+    // Check for common job container patterns
+    const patterns = [
+      'article[data-ev-label="search_result_impression"]',
+      'section[data-test="JobTile"]',
+      'div[data-test="job-tile"]',
+      'article[data-test="job-tile"]',
+      '.job-tile',
+      'article',
+      'section'
+    ];
+
+    patterns.forEach(pattern => {
+      const elements = document.querySelectorAll(pattern);
+      console.log(`${pattern}: ${elements.length} elements`);
+      if (elements.length > 0) {
+        console.log('First element classes:', elements[0].className);
+        console.log('First element data attributes:', Array.from(elements[0].attributes)
+          .filter(attr => attr.name.startsWith('data-'))
+          .map(attr => `${attr.name}="${attr.value}"`)
+        );
+      }
+    });
+
+    // Check for title patterns
+    const titlePatterns = [
+      'h2 a', 'h3 a', 'h4 a',
+      'a[data-test="job-title-link"]',
+      'a[href*="/jobs/"]'
+    ];
+
+    titlePatterns.forEach(pattern => {
+      const elements = document.querySelectorAll(pattern);
+      console.log(`Title pattern ${pattern}: ${elements.length} elements`);
+      if (elements.length > 0) {
+        console.log('Sample title:', elements[0].textContent?.substring(0, 50));
+      }
+    });
+
+    console.log('=== END DEBUG ===');
   }
 
   // Filter jobs based on search query
@@ -304,23 +479,53 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   
   if (request.action === 'scrapeJobs') {
     try {
+      // Run debug if requested
+      if (request.debug) {
+        scraper.debugPageStructure();
+      }
+
       const jobs = scraper.scrapeJobs(request.searchQuery || 'rails');
       const filteredJobs = scraper.filterJobs(jobs, request.searchQuery);
       
-      console.log(`Returning ${filteredJobs.length} jobs to popup`);
+      console.log(`Returning ${filteredJobs.length} jobs to popup (${jobs.length} total found)`);
+      
+      // Send detailed response
       sendResponse({ 
         success: true, 
         jobs: filteredJobs,
-        totalFound: jobs.length
+        totalFound: jobs.length,
+        pageUrl: window.location.href,
+        timestamp: new Date().toISOString()
       });
     } catch (error) {
       console.error('Error scraping jobs:', error);
       sendResponse({ 
         success: false, 
-        error: error.message,
-        jobs: []
+        error: error.message || 'Unknown error',
+        stack: error.stack,
+        jobs: [],
+        pageUrl: window.location.href,
+        timestamp: new Date().toISOString()
       });
     }
+  }
+
+  if (request.action === 'debugPage') {
+    try {
+      scraper.debugPageStructure();
+      sendResponse({ success: true, message: 'Debug info logged to console' });
+    } catch (error) {
+      sendResponse({ success: false, error: error.message });
+    }
+  }
+
+  if (request.action === 'ping') {
+    sendResponse({ 
+      success: true, 
+      message: 'Content script is active',
+      url: window.location.href,
+      timestamp: new Date().toISOString()
+    });
   }
   
   return true; // Keep message channel open for async response

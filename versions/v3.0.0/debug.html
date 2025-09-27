@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Upwork Extension v3.0.0 Debug</title>
+  
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #f6f8f7;
+      color: #122017;
+      width: 400px;
+      min-height: 600px;
+      margin: 0;
+      padding: 0;
+      line-height: 1.5;
+    }
+    
+    .debug-header {
+      background: #38e07b;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+      font-weight: bold;
+    }
+    
+    .debug-section {
+      padding: 1rem;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .debug-title {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #122017;
+    }
+    
+    .debug-info {
+      font-size: 0.875rem;
+      color: #4b5563;
+      margin-bottom: 0.25rem;
+    }
+    
+    .status-good { color: #10b981; }
+    .status-bad { color: #ef4444; }
+    .status-warning { color: #f59e0b; }
+    
+    .test-button {
+      background: #38e07b;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 0.25rem;
+      cursor: pointer;
+      margin: 0.25rem;
+      font-size: 0.875rem;
+    }
+    
+    .test-button:hover {
+      opacity: 0.9;
+    }
+    
+    .log-area {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.25rem;
+      padding: 0.5rem;
+      font-family: monospace;
+      font-size: 0.75rem;
+      max-height: 200px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="debug-header">
+    Upwork Extension v3.0.0 Debug Panel
+  </div>
+
+  <div class="debug-section">
+    <div class="debug-title">File Loading Status</div>
+    <div class="debug-info" id="css-status">CSS: <span class="status-warning">Checking...</span></div>
+    <div class="debug-info" id="js-status">JavaScript: <span class="status-warning">Checking...</span></div>
+    <div class="debug-info" id="fonts-status">Fonts: <span class="status-warning">Checking...</span></div>
+  </div>
+
+  <div class="debug-section">
+    <div class="debug-title">Extension Environment</div>
+    <div class="debug-info" id="chrome-status">Chrome Extension API: <span class="status-warning">Checking...</span></div>
+    <div class="debug-info" id="popup-status">Popup Context: <span class="status-warning">Checking...</span></div>
+    <div class="debug-info" id="manifest-status">Manifest Version: <span class="status-warning">Checking...</span></div>
+  </div>
+
+  <div class="debug-section">
+    <div class="debug-title">Quick Tests</div>
+    <button class="test-button" onclick="testCSS()">Test CSS Loading</button>
+    <button class="test-button" onclick="testJS()">Test JavaScript</button>
+    <button class="test-button" onclick="testTheme()">Test Theme Toggle</button>
+    <button class="test-button" onclick="openMainPopup()">Open Main Popup</button>
+  </div>
+
+  <div class="debug-section">
+    <div class="debug-title">Console Log</div>
+    <div class="log-area" id="log-area"></div>
+  </div>
+
+  <script>
+    // Capture console logs
+    const logArea = document.getElementById('log-area');
+    const originalLog = console.log;
+    const originalError = console.error;
+    
+    function addLog(message, type = 'log') {
+      const timestamp = new Date().toLocaleTimeString();
+      const logEntry = `[${timestamp}] ${type.toUpperCase()}: ${message}\n`;
+      logArea.textContent += logEntry;
+      logArea.scrollTop = logArea.scrollHeight;
+    }
+    
+    console.log = function(...args) {
+      originalLog.apply(console, args);
+      addLog(args.join(' '), 'log');
+    };
+    
+    console.error = function(...args) {
+      originalError.apply(console, args);
+      addLog(args.join(' '), 'error');
+    };
+
+    // Check file loading status
+    function checkFileStatus() {
+      // Check CSS
+      const cssLink = document.createElement('link');
+      cssLink.rel = 'stylesheet';
+      cssLink.href = 'popup-ai-master.css';
+      cssLink.onload = () => {
+        document.getElementById('css-status').innerHTML = 'CSS: <span class="status-good">✓ Loaded</span>';
+      };
+      cssLink.onerror = () => {
+        document.getElementById('css-status').innerHTML = 'CSS: <span class="status-bad">✗ Failed</span>';
+      };
+      document.head.appendChild(cssLink);
+
+      // Check JavaScript
+      const jsScript = document.createElement('script');
+      jsScript.src = 'popup-ai-master.js';
+      jsScript.onload = () => {
+        document.getElementById('js-status').innerHTML = 'JavaScript: <span class="status-good">✓ Loaded</span>';
+      };
+      jsScript.onerror = () => {
+        document.getElementById('js-status').innerHTML = 'JavaScript: <span class="status-bad">✗ Failed</span>';
+      };
+      document.head.appendChild(jsScript);
+
+      // Check fonts
+      document.fonts.ready.then(() => {
+        const hasInter = document.fonts.check('1em Inter');
+        const hasMaterial = document.fonts.check('1em "Material Symbols Outlined"');
+        
+        let fontStatus = '';
+        if (hasInter && hasMaterial) {
+          fontStatus = 'Fonts: <span class="status-good">✓ All loaded</span>';
+        } else if (hasInter || hasMaterial) {
+          fontStatus = 'Fonts: <span class="status-warning">⚠ Partial</span>';
+        } else {
+          fontStatus = 'Fonts: <span class="status-bad">✗ None loaded</span>';
+        }
+        document.getElementById('fonts-status').innerHTML = fontStatus;
+      });
+
+      // Check Chrome extension API
+      if (typeof chrome !== 'undefined' && chrome.runtime) {
+        document.getElementById('chrome-status').innerHTML = 'Chrome Extension API: <span class="status-good">✓ Available</span>';
+      } else {
+        document.getElementById('chrome-status').innerHTML = 'Chrome Extension API: <span class="status-bad">✗ Not available</span>';
+      }
+
+      // Check popup context
+      if (window.location.protocol === 'chrome-extension:') {
+        document.getElementById('popup-status').innerHTML = 'Popup Context: <span class="status-good">✓ Extension popup</span>';
+      } else {
+        document.getElementById('popup-status').innerHTML = 'Popup Context: <span class="status-warning">⚠ Browser page</span>';
+      }
+
+      // Check manifest
+      if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getManifest) {
+        const manifest = chrome.runtime.getManifest();
+        document.getElementById('manifest-status').innerHTML = `Manifest Version: <span class="status-good">✓ v${manifest.version}</span>`;
+      } else {
+        document.getElementById('manifest-status').innerHTML = 'Manifest Version: <span class="status-bad">✗ Not accessible</span>';
+      }
+    }
+
+    function testCSS() {
+      const testDiv = document.createElement('div');
+      testDiv.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: var(--primary-color, #38e07b);
+        color: white;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        z-index: 9999;
+      `;
+      testDiv.textContent = 'CSS Variables Test';
+      document.body.appendChild(testDiv);
+      
+      setTimeout(() => {
+        document.body.removeChild(testDiv);
+      }, 2000);
+      
+      addLog('CSS test executed');
+    }
+
+    function testJS() {
+      try {
+        if (window.upworkExtension) {
+          addLog('JavaScript: Extension class found');
+          window.upworkExtension.showNotification('JavaScript test successful!', 'success');
+        } else {
+          addLog('JavaScript: Extension class not found');
+        }
+      } catch (error) {
+        addLog(`JavaScript error: ${error.message}`);
+      }
+    }
+
+    function testTheme() {
+      const body = document.body;
+      const currentTheme = body.getAttribute('data-theme') || 'light';
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      body.setAttribute('data-theme', newTheme);
+      addLog(`Theme switched to: ${newTheme}`);
+    }
+
+    function openMainPopup() {
+      window.open('popup-ai-master.html', 'main-popup', 'width=400,height=600');
+      addLog('Main popup opened');
+    }
+
+    // Initialize checks
+    document.addEventListener('DOMContentLoaded', () => {
+      addLog('Debug panel initialized');
+      checkFileStatus();
+    });
+  </script>
+</body>
+</html>

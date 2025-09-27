@@ -4,14 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upwork Rails Scraper</title>
-    <link rel="stylesheet" href="popup.css">
+    <link rel="stylesheet" href="../../shared/popup-modern.css">
 </head>
 <body>
     <div class="header">
-        <h2>🚀 Rails Jobs Scraper</h2>
+        <div class="theme-toggle" id="themeToggle" title="Toggle Dark Mode">🌙</div>
+        <h2>🪄 Magic Upwork Assistant</h2>
         <div class="search-section">
-            <input type="text" id="searchInput" placeholder="Search for Rails jobs..." value="rails">
-            <button id="scrapeBtn">Scrape Jobs</button>
+            <input type="text" id="searchInput" placeholder="Search for Rails, AI, React jobs..." value="rails">
+            <button id="scrapeBtn">✨ Analyze Jobs</button>
         </div>
     </div>
     
@@ -38,8 +39,35 @@
         <p>Please navigate to Upwork job search page first</p>
     </div>
 
+    <!-- Analytics Dashboard -->
+    <div id="analyticsDashboard" class="analytics-dashboard hidden">
+        <div class="analytics-header">
+            <h3>📊 Market Insights</h3>
+            <button id="toggleAnalytics">Hide Analytics</button>
+        </div>
+        <div class="analytics-grid">
+            <div class="analytics-card">
+                <div class="analytics-number" id="avgScore">0</div>
+                <div class="analytics-label">Avg Score</div>
+            </div>
+            <div class="analytics-card">
+                <div class="analytics-number" id="highBudgetJobs">0</div>
+                <div class="analytics-label">High Budget</div>
+            </div>
+            <div class="analytics-card">
+                <div class="analytics-number" id="lowCompetition">0</div>
+                <div class="analytics-label">Low Competition</div>
+            </div>
+            <div class="analytics-card">
+                <div class="analytics-number" id="trendingJobs">0</div>
+                <div class="analytics-label">Trending Skills</div>
+            </div>
+        </div>
+        <div id="topSkills" class="top-skills"></div>
+    </div>
+
     <div id="jobsList" class="jobs-container">
-        <!-- Jobs will be populated here -->
+        <!-- Jobs with AI analysis will be populated here -->
     </div>
 
     <div class="auto-scrape-section">
@@ -119,13 +147,80 @@
         <div id="slackStatus" class="hidden slack-status"></div>
     </div>
 
+    <!-- 🤖 AI Auto-Apply Section -->
+    <div class="auto-apply-section">
+        <div class="auto-apply-header">
+            <h3>🤖 Smart Auto-Apply</h3>
+            <div class="toggle-switch">
+                <input type="checkbox" id="autoApplyToggle" class="toggle-input">
+                <label for="autoApplyToggle" class="toggle-label">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+        
+        <div id="autoApplyControls" class="hidden auto-apply-controls">
+            <div class="control-row">
+                <label>Minimum AI Score:</label>
+                <select id="minAIScore">
+                    <option value="70">70+ (Good matches)</option>
+                    <option value="75" selected>75+ (Great matches)</option>
+                    <option value="80">80+ (Excellent matches)</option>
+                    <option value="85">85+ (Perfect matches only)</option>
+                </select>
+            </div>
+            
+            <div class="control-row">
+                <label>Max applications/day:</label>
+                <select id="maxAppsPerDay">
+                    <option value="5">5 applications</option>
+                    <option value="10" selected>10 applications</option>
+                    <option value="15">15 applications</option>
+                    <option value="20">20 applications</option>
+                </select>
+            </div>
+            
+            <div class="control-row">
+                <label>
+                    <input type="checkbox" id="autoSubmitProposals">
+                    Auto-submit proposals (⚠️ Use with caution!)
+                </label>
+            </div>
+            
+            <div class="control-row">
+                <label>
+                    <input type="checkbox" id="customizeProposals" checked>
+                    Customize proposals for each job
+                </label>
+            </div>
+            
+            <div id="autoApplyStatus" class="auto-apply-status">
+                <div class="status-item">
+                    <span>Today's Applications:</span>
+                    <span id="todayAppsCount">0</span>
+                </div>
+                <div class="status-item">
+                    <span>Success Rate:</span>
+                    <span id="successRate">--</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="footer">
-        <button id="exportBtn">Export to JSON</button>
+        <button id="exportBtn">📊 Export Data</button>
+        <button id="showAnalytics">📈 Show Analytics</button>
         <a href="https://www.upwork.com/nx/search/jobs/?q=rails" target="_blank" id="openUpwork">
-            Open Upwork
+            🚀 Open Upwork
         </a>
     </div>
 
-    <script src="popup.js"></script>
+    <!-- Load All Magic Components -->
+    <script src="ai-engine.js"></script>
+    <script src="auto-apply-engine.js"></script>
+    <script src="profile-optimizer.js"></script>
+    <script src="notification-engine.js"></script>
+    <script src="data-export.js"></script>
+    <script src="popup-enhanced.js"></script>
 </body>
 </html>

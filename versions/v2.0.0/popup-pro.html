@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magic Upwork Assistant Pro</title>
+    <link rel="stylesheet" href="popup-pro.css">
+    <link rel="stylesheet" href="../../shared/version-styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <div class="logo">
+                    <span class="logo-icon">🪄</span>
+                    <span class="logo-text">Magic Upwork Pro</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <div id="versionDisplay" class="version-display-container"></div>
+                <button class="header-btn" id="settingsBtn" title="Settings">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 15.5A3.5 3.5 0 0 1 8.5 12A3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5 3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97c0-.33-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 14 2h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1c0 .33.03.65.07.97l-2.11 1.66c-.19.15-.25.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1.01c.52.4 1.06.74 1.69.99l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.63-.26 1.17-.59 1.69-.99l2.49 1.01c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.66Z"/>
+                    </svg>
+                </button>
+                <button class="header-btn" id="notificationBtn" title="Notifications">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+                    </svg>
+                    <span class="notification-badge" id="notificationBadge">3</span>
+                </button>
+                <div class="user-avatar">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='%2310b981'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E" alt="User">
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs">
+            <button class="nav-tab active" data-tab="jobs">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20 6h-2.18c.11-.31.18-.65.18-1a2.996 2.996 0 0 0-5.5-1.65l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1z"/>
+                </svg>
+                Jobs
+            </button>
+            <button class="nav-tab" data-tab="proposals">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 2 2h8c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                </svg>
+                Proposals
+            </button>
+            <button class="nav-tab" data-tab="analytics">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+                </svg>
+                Analytics
+            </button>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Jobs Tab -->
+            <div class="tab-content active" id="jobs-tab">
+                <div class="content-layout">
+                    <!-- Filters Sidebar -->
+                    <aside class="filters-sidebar">
+                        <div class="filters-header">
+                            <h3>Filters</h3>
+                            <button class="clear-filters" id="clearFilters">Clear All</button>
+                        </div>
+
+                        <div class="filter-section">
+                            <div class="search-box">
+                                <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                                </svg>
+                                <input type="text" id="searchInput" placeholder="Search jobs..." />
+                            </div>
+                        </div>
+
+                        <div class="filter-section">
+                            <label class="filter-label">Category</label>
+                            <select class="filter-select" id="categoryFilter">
+                                <option value="">All Categories</option>
+                                <option value="web-development">Web Development</option>
+                                <option value="mobile-development">Mobile Development</option>
+                                <option value="data-science">Data Science</option>
+                                <option value="design">Design</option>
+                                <option value="writing">Writing</option>
+                                <option value="marketing">Marketing</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-section">
+                            <label class="filter-label">Skills</label>
+                            <select class="filter-select" id="skillsFilter">
+                                <option value="">All Skills</option>
+                                <option value="javascript">JavaScript</option>
+                                <option value="python">Python</option>
+                                <option value="react">React</option>
+                                <option value="nodejs">Node.js</option>
+                                <option value="rails">Ruby on Rails</option>
+                                <option value="ai-ml">AI/ML</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-section">
+                            <label class="filter-label">Experience Level</label>
+                            <select class="filter-select" id="experienceFilter">
+                                <option value="">All Levels</option>
+                                <option value="entry">Entry Level</option>
+                                <option value="intermediate">Intermediate</option>
+                                <option value="expert">Expert</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-section">
+                            <label class="filter-label">Budget Range</label>
+                            <div class="budget-inputs">
+                                <input type="number" id="minBudget" placeholder="Min $" class="budget-input">
+                                <span class="budget-separator">-</span>
+                                <input type="number" id="maxBudget" placeholder="Max $" class="budget-input">
+                            </div>
+                        </div>
+
+                        <div class="filter-section">
+                            <label class="filter-label">AI Score</label>
+                            <div class="score-range">
+                                <input type="range" id="minScoreRange" min="0" max="100" value="70" class="score-slider">
+                                <div class="score-display">
+                                    <span>Min Score: </span>
+                                    <span id="minScoreValue">70</span>%
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="filter-section">
+                            <label class="filter-label">Posted Date</label>
+                            <select class="filter-select" id="postedDateFilter">
+                                <option value="">Any Time</option>
+                                <option value="1">Last 24 hours</option>
+                                <option value="3">Last 3 days</option>
+                                <option value="7">Last week</option>
+                                <option value="30">Last month</option>
+                            </select>
+                        </div>
+                    </aside>
+
+                    <!-- Jobs List -->
+                    <div class="jobs-main">
+                        <div class="jobs-header">
+                            <div class="jobs-title">
+                                <h2>Job Postings</h2>
+                                <span class="job-count" id="jobCount">0 jobs found</span>
+                            </div>
+                            <div class="jobs-actions">
+                                <button class="action-btn primary" id="generateProposalBtn">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                    </svg>
+                                    Generate Proposal
+                                </button>
+                                <button class="action-btn secondary" id="sendToSlackBtn">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                    </svg>
+                                    Send to Slack
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="jobs-table-container">
+                            <table class="jobs-table">
+                                <thead>
+                                    <tr>
+                                        <th class="checkbox-col">
+                                            <input type="checkbox" id="selectAll" class="table-checkbox">
+                                        </th>
+                                        <th class="sortable job-title-col" data-sort="title">Job Title</th>
+                                        <th class="sortable skills-col" data-sort="skills">Skills</th>
+                                        <th class="sortable budget-col" data-sort="budget">Budget</th>
+                                        <th class="sortable posted-col" data-sort="posted">Posted</th>
+                                        <th class="sortable score-col" data-sort="ai_score">Score</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="jobsTableBody">
+                                    <!-- Jobs will be populated here -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="loading-state" id="loadingState">
+                            <div class="loading-spinner"></div>
+                            <p>Analyzing jobs with AI...</p>
+                        </div>
+
+                        <div class="empty-state" id="emptyState">
+                            <div class="empty-icon">🔍</div>
+                            <h3>No jobs found</h3>
+                            <p>Try adjusting your filters or search terms</p>
+                            <button class="action-btn primary" id="scrapeJobsBtn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+                                </svg>
+                                Scrape New Jobs
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Proposals Tab -->
+            <div class="tab-content" id="proposals-tab">
+                <div class="proposal-generator">
+                    <div class="generator-header">
+                        <h2>Generate Proposal</h2>
+                        <p>Use AI to create a compelling proposal for your next job.</p>
+                    </div>
+
+                    <div class="generator-layout">
+                        <div class="input-section">
+                            <div class="input-group">
+                                <label class="input-label">Job Details</label>
+                                <textarea 
+                                    id="jobDetailsInput" 
+                                    class="input-textarea" 
+                                    placeholder="Paste job details here..."
+                                    rows="8"
+                                ></textarea>
+                            </div>
+
+                            <div class="input-row">
+                                <div class="input-group">
+                                    <label class="input-label">Tone</label>
+                                    <select id="proposalTone" class="input-select">
+                                        <option value="professional">Professional</option>
+                                        <option value="friendly">Friendly</option>
+                                        <option value="confident">Confident</option>
+                                        <option value="casual">Casual</option>
+                                    </select>
+                                </div>
+
+                                <div class="input-group">
+                                    <label class="input-label">Length</label>
+                                    <select id="proposalLength" class="input-select">
+                                        <option value="short">Short</option>
+                                        <option value="medium" selected>Medium</option>
+                                        <option value="long">Long</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="input-group">
+                                <label class="input-label">Focus</label>
+                                <select id="proposalFocus" class="input-select">
+                                    <option value="experience">Experience</option>
+                                    <option value="skills">Skills</option>
+                                    <option value="results">Results</option>
+                                    <option value="process">Process</option>
+                                </select>
+                            </div>
+
+                            <button class="generate-btn" id="generateProposalMainBtn">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                </svg>
+                                Generate Proposal
+                            </button>
+                        </div>
+
+                        <div class="output-section">
+                            <div class="output-header">
+                                <h3>Generated Proposal</h3>
+                                <div class="output-actions">
+                                    <button class="icon-btn" id="copyProposalBtn" title="Copy to clipboard">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                                        </svg>
+                                    </button>
+                                    <button class="icon-btn" id="regenerateBtn" title="Regenerate">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <textarea 
+                                id="generatedProposal" 
+                                class="output-textarea" 
+                                placeholder="Generated proposal will appear here..."
+                                rows="15"
+                            ></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Tab -->
+            <div class="tab-content" id="analytics-tab">
+                <div class="analytics-dashboard">
+                    <div class="dashboard-header">
+                        <h2>Analytics Dashboard</h2>
+                        <p>Track your job search performance and market insights</p>
+                    </div>
+
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-icon">📊</div>
+                            <div class="metric-content">
+                                <div class="metric-value" id="totalJobsMetric">0</div>
+                                <div class="metric-label">Total Jobs Analyzed</div>
+                            </div>
+                        </div>
+
+                        <div class="metric-card">
+                            <div class="metric-icon">⭐</div>
+                            <div class="metric-content">
+                                <div class="metric-value" id="avgScoreMetric">0%</div>
+                                <div class="metric-label">Average AI Score</div>
+                            </div>
+                        </div>
+
+                        <div class="metric-card">
+                            <div class="metric-icon">🎯</div>
+                            <div class="metric-content">
+                                <div class="metric-value" id="highQualityMetric">0</div>
+                                <div class="metric-label">High Quality Jobs</div>
+                            </div>
+                        </div>
+
+                        <div class="metric-card">
+                            <div class="metric-icon">💰</div>
+                            <div class="metric-content">
+                                <div class="metric-value" id="avgBudgetMetric">$0</div>
+                                <div class="metric-label">Average Budget</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="charts-grid">
+                        <div class="chart-card">
+                            <h3>Top Skills in Demand</h3>
+                            <div class="skills-chart" id="skillsChart">
+                                <!-- Skills chart will be populated here -->
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <h3>Budget Distribution</h3>
+                            <div class="budget-chart" id="budgetChart">
+                                <!-- Budget chart will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Settings Modal -->
+        <div class="modal-overlay" id="settingsModal">
+            <div class="modal-content settings-modal">
+                <div class="modal-header">
+                    <h2>Settings</h2>
+                    <button class="close-btn" id="closeSettingsBtn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="settings-content">
+                    <div class="settings-section">
+                        <h3>Job Scraping Preferences</h3>
+                        <p>Configure your preferences to find the perfect jobs on the platform.</p>
+
+                        <div class="setting-group">
+                            <label class="setting-label">Keywords</label>
+                            <input type="text" id="keywordsInput" class="setting-input" placeholder="e.g., Web Development, Data Analysis">
+                        </div>
+
+                        <div class="setting-row">
+                            <div class="setting-group">
+                                <label class="setting-label">Minimum Budget</label>
+                                <div class="budget-input-group">
+                                    <span class="currency-symbol">$</span>
+                                    <input type="number" id="minBudgetSetting" class="setting-input" placeholder="0">
+                                </div>
+                            </div>
+
+                            <div class="setting-group">
+                                <label class="setting-label">Maximum Budget</label>
+                                <div class="budget-input-group">
+                                    <span class="currency-symbol">$</span>
+                                    <input type="number" id="maxBudgetSetting" class="setting-input" placeholder="1000">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="setting-group">
+                            <h4>Schedule Scraping</h4>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" name="scrapeSchedule" value="manual" checked>
+                                    <span class="radio-custom"></span>
+                                    Manual
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="scrapeSchedule" value="scheduled">
+                                    <span class="radio-custom"></span>
+                                    Scheduled
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="setting-row" id="scheduleSettings" style="display: none;">
+                            <div class="setting-group">
+                                <label class="setting-label">Frequency</label>
+                                <select class="setting-select">
+                                    <option value="daily">Daily</option>
+                                    <option value="weekly">Weekly</option>
+                                    <option value="hourly">Hourly</option>
+                                </select>
+                            </div>
+
+                            <div class="setting-group">
+                                <label class="setting-label">Time</label>
+                                <input type="time" class="setting-input" value="09:00">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>Slack Integration</h3>
+                        <p>ConnectFlow can send you notifications about new jobs and proposals directly to your Slack workspace.</p>
+
+                        <div class="setting-group">
+                            <label class="setting-label">Slack Workspace URL</label>
+                            <input type="text" id="slackWorkspaceInput" class="setting-input" placeholder="your-workspace.slack.com">
+                        </div>
+
+                        <div class="setting-group">
+                            <label class="setting-label">Select Channel</label>
+                            <select class="setting-select" id="slackChannelSelect">
+                                <option value="general">#general</option>
+                                <option value="jobs">#jobs</option>
+                                <option value="notifications">#notifications</option>
+                            </select>
+                        </div>
+
+                        <div class="setting-group">
+                            <h4>Job Alerts</h4>
+                            <div class="checkbox-group">
+                                <label class="checkbox-option">
+                                    <input type="checkbox" id="newJobAlerts" checked>
+                                    <span class="checkbox-custom"></span>
+                                    Send me alerts for new jobs matching my saved searches
+                                </label>
+                                <label class="checkbox-option">
+                                    <input type="checkbox" id="proposalAlerts">
+                                    <span class="checkbox-custom"></span>
+                                    Send me alerts when a proposal is submitted
+                                </label>
+                            </div>
+                        </div>
+
+                        <button class="connect-btn" id="connectSlackBtn">Connect to Slack</button>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>AI Proposal Settings</h3>
+                        <p>Customize how AI generates your proposals</p>
+
+                        <div class="setting-row">
+                            <div class="setting-group">
+                                <label class="setting-label">Default Tone</label>
+                                <select class="setting-select" id="defaultTone">
+                                    <option value="professional">Professional</option>
+                                    <option value="friendly">Friendly</option>
+                                    <option value="confident">Confident</option>
+                                </select>
+                            </div>
+
+                            <div class="setting-group">
+                                <label class="setting-label">Default Length</label>
+                                <select class="setting-select" id="defaultLength">
+                                    <option value="short">Short</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="long">Long</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="setting-group">
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="autoCustomize" checked>
+                                <span class="checkbox-custom"></span>
+                                Automatically customize proposals based on job requirements
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn-secondary" id="cancelSettingsBtn">Cancel</button>
+                    <button class="btn-primary" id="saveSettingsBtn">Save Preferences</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load All Magic Components -->
+    <script src="../../shared/version-config.js"></script>
+    <script src="../../shared/version-display.js"></script>
+    <script src="ai-engine.js"></script>
+    <script src="auto-apply-engine.js"></script>
+    <script src="profile-optimizer.js"></script>
+    <script src="notification-engine.js"></script>
+    <script src="data-export.js"></script>
+    <script src="../../dev/test-data.js"></script>
+    <script src="popup-pro.js"></script>
+</body>
+</html>

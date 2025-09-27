@@ -1,7 +1,10 @@
+// Import version management
+importScripts('version-manager.js');
+
 // Background service worker for Upwork Rails Job Scraper
 class BackgroundService {
   constructor() {
-    this.slackWebhookUrl = stored.slack_webhook_url;
+    this.slackWebhookUrl = null; // Will be loaded from storage
     this.jobHistory = new Set(); // Track seen job URLs
     this.isAutoScraping = false;
     this.scrapeInterval = null;
@@ -75,7 +78,7 @@ class BackgroundService {
   }
 
   async initializeStorage() {
-    const result = await chrome.storage.local.get(['extension_installed', 'auto_scrape_settings', 'job_history']);
+    const result = await chrome.storage.local.get(['extension_installed', 'auto_scrape_settings', 'job_history', 'slack_webhook_url']);
     
     if (!result.extension_installed) {
       await chrome.storage.local.set({
@@ -101,6 +104,11 @@ class BackgroundService {
     // Load job history into memory
     if (result.job_history) {
       this.jobHistory = new Set(result.job_history);
+    }
+    
+    // Load Slack webhook URL
+    if (result.slack_webhook_url) {
+      this.slackWebhookUrl = result.slack_webhook_url;
     }
   }
 
@@ -304,7 +312,7 @@ class BackgroundService {
           // Inject content script and scrape
           await chrome.scripting.executeScript({
             target: { tabId: upworkTab.id },
-            files: ['content.js']
+            files: ['shared/content.js']
           });
           
           // Wait a bit more for content script to initialize
@@ -611,7 +619,7 @@ chrome.action.onClicked?.addListener(async (tab) => {
     try {
       await chrome.scripting.executeScript({
         target: { tabId: tab.id },
-        files: ['content.js']
+        files: ['shared/content.js']
       });
     } catch (error) {
       console.error('Error injecting script:', error);

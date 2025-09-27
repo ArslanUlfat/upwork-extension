@@ -1,0 +1,42 @@
+{
+  "manifest_version": 3,
+  "name": "🔍 Upwork Job Scraper - Basic",
+  "version": "1.0.0",
+  "description": "Basic job scraping with essential features",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "tabs",
+    "alarms",
+    "notifications",
+    "background"
+  ],
+  "host_permissions": [
+    "https://www.upwork.com/*",
+    "https://hooks.slack.com/*"
+  ],
+  "action": {
+    "default_popup": "popup-basic.html",
+    "default_title": "🔍 Upwork Job Scraper - Basic"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.upwork.com/nx/search/jobs*"
+      ],
+      "js": [
+        "../../shared/content.js"
+      ],
+      "run_at": "document_end"
+    }
+  ],
+  "background": {
+    "service_worker": "../../shared/background.js"
+  },
+  "icons": {
+    "16": "../../assets/icons/icon16.png",
+    "48": "../../assets/icons/icon48.png",
+    "128": "../../assets/icons/icon128.png"
+  }
+}

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upwork Job Scraper</title>
+    <link rel="stylesheet" href="popup-basic.css">
+    <link rel="stylesheet" href="../../shared/version-styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <div class="logo">
+                    <span class="logo-icon">🔍</span>
+                    <span class="logo-text">Upwork Scraper</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <div id="versionDisplay" class="version-display-container"></div>
+                <button class="header-btn" id="settingsBtn" title="Settings">⚙️</button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Status Section -->
+            <section class="status-section">
+                <div class="status-card">
+                    <div class="status-info">
+                        <span class="status-label">Jobs Found:</span>
+                        <span class="status-value" id="jobCount">0</span>
+                    </div>
+                    <div class="status-info">
+                        <span class="status-label">Last Scan:</span>
+                        <span class="status-value" id="lastScan">Never</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Action Buttons -->
+            <section class="actions-section">
+                <button class="btn-primary" id="scrapeBtn">
+                    <span class="btn-icon">🔍</span>
+                    <span class="btn-text">Scrape Jobs</span>
+                </button>
+                
+                <button class="btn-secondary" id="autoScrapeBtn">
+                    <span class="btn-icon">⏰</span>
+                    <span class="btn-text">Auto Scrape: OFF</span>
+                </button>
+            </section>
+
+            <!-- Jobs List -->
+            <section class="jobs-section">
+                <div class="section-header">
+                    <h3>Recent Jobs</h3>
+                    <div class="section-actions">
+                        <button class="btn-small" id="exportBtn">Export</button>
+                        <button class="btn-small" id="clearBtn">Clear</button>
+                    </div>
+                </div>
+                
+                <div class="jobs-container" id="jobsContainer">
+                    <div class="empty-state">
+                        <div class="empty-icon">📋</div>
+                        <div class="empty-text">No jobs scraped yet</div>
+                        <div class="empty-subtext">Click "Scrape Jobs" to get started</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Upgrade Promotion (for v1.0.0 users) -->
+            <section class="upgrade-section" id="upgradeSection" style="display: none;">
+                <div class="upgrade-card">
+                    <div class="upgrade-header">
+                        <span class="upgrade-icon">🪄</span>
+                        <div class="upgrade-title">Upgrade to Magic Edition</div>
+                    </div>
+                    <div class="upgrade-content">
+                        <div class="upgrade-description">
+                            Get AI-powered job analysis, auto-apply, and advanced features!
+                        </div>
+                        <div class="upgrade-features">
+                            <div class="upgrade-feature">✨ AI Job Scoring</div>
+                            <div class="upgrade-feature">🤖 Auto Apply</div>
+                            <div class="upgrade-feature">📊 Analytics Dashboard</div>
+                            <div class="upgrade-feature">🎨 Modern Dark UI</div>
+                        </div>
+                        <button class="btn-upgrade" id="upgradeBtn">Upgrade Now</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Settings Modal -->
+        <div class="modal" id="settingsModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Settings</h3>
+                    <button class="close-btn" id="closeSettingsBtn">×</button>
+                </div>
+                
+                <div class="modal-body">
+                    <!-- Basic Settings -->
+                    <div class="setting-group">
+                        <h4>Scraping</h4>
+                        <div class="setting-item">
+                            <label for="maxJobs">Max Jobs to Scrape:</label>
+                            <input type="number" id="maxJobs" min="10" max="100" value="50">
+                        </div>
+                        <div class="setting-item">
+                            <label for="autoInterval">Auto Scrape Interval (minutes):</label>
+                            <input type="number" id="autoInterval" min="5" max="60" value="15">
+                        </div>
+                    </div>
+
+                    <!-- Filtering -->
+                    <div class="setting-group">
+                        <h4>Filtering</h4>
+                        <div class="setting-item">
+                            <label for="keywords">Keywords (comma separated):</label>
+                            <input type="text" id="keywords" placeholder="rails, ruby, javascript">
+                        </div>
+                        <div class="setting-item">
+                            <label for="excludeKeywords">Exclude Keywords:</label>
+                            <input type="text" id="excludeKeywords" placeholder="wordpress, php">
+                        </div>
+                    </div>
+
+                    <!-- Notifications -->
+                    <div class="setting-group">
+                        <h4>Notifications</h4>
+                        <div class="setting-item">
+                            <label>
+                                <input type="checkbox" id="browserNotifications" checked>
+                                Browser Notifications
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <label>
+                                <input type="checkbox" id="slackNotifications">
+                                Slack Notifications
+                            </label>
+                        </div>
+                        <div class="setting-item" id="slackWebhookGroup" style="display: none;">
+                            <label for="slackWebhook">Slack Webhook URL:</label>
+                            <input type="url" id="slackWebhook" placeholder="https://hooks.slack.com/...">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button class="btn-secondary" id="cancelSettingsBtn">Cancel</button>
+                    <button class="btn-primary" id="saveSettingsBtn">Save Settings</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../shared/version-config.js"></script>
+    <script src="../../shared/version-display.js"></script>
+    <script src="popup-basic.js"></script>
+</body>
+</html>

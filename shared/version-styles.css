@@ -1,0 +1,551 @@
+/**
+ * 🪄 Magic Upwork Assistant - Version Display Styles
+ * Styles for version information and upgrade components
+ */
+
+/* Version Badge */
+.version-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+}
+
+.version-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+}
+
+.version-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+
+.version-number {
+  font-weight: 700;
+  font-size: 10px;
+}
+
+.version-name {
+  font-size: 8px;
+  opacity: 0.9;
+  font-weight: 500;
+}
+
+/* Version Indicator (Compact) */
+.version-indicator {
+  display: inline-block;
+  padding: 2px 6px;
+  background: rgba(102, 126, 234, 0.1);
+  border: 1px solid rgba(102, 126, 234, 0.3);
+  border-radius: 8px;
+  color: #667eea;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: help;
+}
+
+/* Feature Indicators */
+.feature-indicator {
+  display: inline-block;
+  margin: 0 2px;
+  font-size: 12px;
+  cursor: help;
+}
+
+.feature-indicator.available {
+  opacity: 1;
+}
+
+.feature-indicator.unavailable {
+  opacity: 0.5;
+  filter: grayscale(100%);
+}
+
+.features-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+}
+
+/* Version Modal */
+.version-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.version-modal.show {
+  opacity: 1;
+}
+
+.version-modal-content {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 20px;
+  padding: 0;
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  transform: scale(0.9);
+  transition: transform 0.3s ease;
+}
+
+.version-modal.show .version-modal-content {
+  transform: scale(1);
+}
+
+.version-modal-header {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.version-modal-header h2 {
+  margin: 0;
+  color: white;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.3s ease;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.version-modal-body {
+  padding: 20px;
+  background: white;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.version-details {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.version-main-info {
+  text-align: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-radius: 16px;
+}
+
+.version-number-large {
+  font-size: 48px;
+  font-weight: 900;
+  color: #667eea;
+  margin-bottom: 8px;
+}
+
+.version-codename {
+  font-size: 18px;
+  font-weight: 600;
+  color: #764ba2;
+  margin-bottom: 8px;
+}
+
+.version-description {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.version-release-date {
+  font-size: 12px;
+  color: #999;
+  font-weight: 500;
+}
+
+/* Features Section */
+.features-section {
+  margin-bottom: 24px;
+}
+
+.features-section h3 {
+  margin: 0 0 16px 0;
+  color: #333;
+  font-size: 18px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.feature-item.available {
+  background: linear-gradient(135deg, #e8f5e8 0%, #f0fff0 100%);
+  border: 1px solid #c8e6c9;
+}
+
+.feature-item.unavailable {
+  background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+  border: 1px solid #fdcb6e;
+  opacity: 0.7;
+}
+
+.feature-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.feature-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.feature-name {
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.feature-description {
+  font-size: 12px;
+  color: #666;
+  line-height: 1.4;
+  display: block;
+}
+
+/* Upgrade Section */
+.upgrade-section {
+  padding: 20px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.upgrade-status.current {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.upgrade-available h3 {
+  margin: 0 0 16px 0;
+  color: white;
+  font-size: 20px;
+}
+
+.upgrade-info {
+  margin-bottom: 20px;
+}
+
+.upgrade-version {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.upgrade-description {
+  font-size: 14px;
+  opacity: 0.9;
+  line-height: 1.5;
+}
+
+.new-features h4 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.new-features ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.new-features li {
+  margin-bottom: 8px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* Modal Footer */
+.version-modal-footer {
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-primary, .btn-secondary {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.btn-primary {
+  background: white;
+  color: #667eea;
+}
+
+.btn-primary:hover {
+  background: #f8f9ff;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Upgrade Notification */
+.upgrade-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+  z-index: 9999;
+  max-width: 350px;
+  animation: slideInRight 0.5s ease;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.upgrade-notification-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.upgrade-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.upgrade-text {
+  flex: 1;
+}
+
+.upgrade-title {
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.upgrade-subtitle {
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.upgrade-btn {
+  background: white;
+  color: #667eea;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.upgrade-btn:hover {
+  background: #f8f9ff;
+  transform: translateY(-1px);
+}
+
+.close-notification {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.close-notification:hover {
+  opacity: 1;
+}
+
+/* Version-specific classes */
+.version-1-0-0 {
+  --primary-color: #4a90e2;
+  --accent-color: #357abd;
+}
+
+.version-2-0-0 {
+  --primary-color: #667eea;
+  --accent-color: #764ba2;
+}
+
+.version-3-0-0 {
+  --primary-color: #ff6b6b;
+  --accent-color: #ee5a24;
+}
+
+/* Feature-based classes */
+.has-aianalysis .ai-features {
+  display: block !important;
+}
+
+.has-autoapply .auto-apply-section {
+  display: block !important;
+}
+
+.has-analytics .analytics-dashboard {
+  display: block !important;
+}
+
+.has-darkmode {
+  --supports-dark-mode: true;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .version-modal-content {
+    width: 95%;
+    margin: 20px;
+  }
+  
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .version-number-large {
+    font-size: 36px;
+  }
+  
+  .upgrade-notification {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    max-width: none;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .version-modal-body {
+    background: #1a1a1a;
+    color: #e0e0e0;
+  }
+  
+  .version-main-info {
+    background: linear-gradient(135deg, #2d2d2d 0%, #3d3d3d 100%);
+  }
+  
+  .version-description {
+    color: #b0b0b0;
+  }
+  
+  .version-release-date {
+    color: #888;
+  }
+  
+  .features-section h3 {
+    color: #e0e0e0;
+  }
+  
+  .feature-item.available {
+    background: linear-gradient(135deg, #1e3a1e 0%, #2d4a2d 100%);
+    border-color: #4a6741;
+  }
+  
+  .feature-item.unavailable {
+    background: linear-gradient(135deg, #3d2f1f 0%, #4a3426 100%);
+    border-color: #6b4423;
+  }
+  
+  .feature-name {
+    color: #e0e0e0;
+  }
+  
+  .feature-description {
+    color: #b0b0b0;
+  }
+}
